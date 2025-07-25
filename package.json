@@ -4,15 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "bench": "tsx bench/index.ts --host http://localhost:3000 --name my-bench --folder results",
+    "bench": "tsx bench/index.ts --folder results",
     "start:docker": "tsx ./src/docker.ts",
     "start:seed": "tsx ./src/seed.ts",
     "start:seed:sqlite": "tsx ./src/sqlite/seed.ts",
     "start:generate": "tsx ./src/generate.ts",
     "prepare:prisma": "prisma generate --schema src/schema.prisma",
     "prepare:prisma:sqlite": "prisma generate --schema src/sqlite/schema.prisma",
-    "start:prisma": "tsx ./src/prisma-server.ts",
-    "start:drizzle": "tsx ./src/drizzle-server.ts"
+    "start:prisma:node": "tsx ./src/prisma-server-node.ts",
+    "start:prisma:bun": "tsx ./src/prisma-server-bun.ts",
+    "start:drizzle:node": "tsx ./src/drizzle-server-node.ts",
+    "start:drizzle:bun": "tsx ./src/drizzle-server-bun.ts"
   },
   "keywords": [],
   "author": "",
@@ -35,12 +37,13 @@
     "get-port": "^7.0.0",
     "k6": "^0.0.0",
     "postgres": "^3.3.5",
+    "prisma": "6.12.0",
     "tsx": "^3.12.7",
     "typescript": "^5.1.6"
   },
   "dependencies": {
     "@hono/node-server": "^1.1.1",
-    "@prisma/client": "5.18.0",
+    "@prisma/client": "6.12.0",
     "axios": "^1.4.0",
     "better-sqlite3": "^11.2.1",
     "concurrently": "^8.2.2",
@@ -51,7 +54,12 @@
     "pg": "^8.11.2",
     "pg-native": "^3.1.0",
     "pidusage": "^3.0.2",
-    "prisma": "^5.18.0",
     "ramda": "^0.29.0"
+  },
+  "packageManager": "pnpm@10.6.2+sha512.47870716bea1572b53df34ad8647b42962bc790ce2bf4562ba0f643237d7302a3d6a8ecef9e4bdfc01d23af1969aa90485d4cebb0b9638fa5ef1daef656f6c1b",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "libpq"
+    ]
   }
 }
