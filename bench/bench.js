@@ -3,9 +3,13 @@ import { SharedArray } from 'k6/data';
 import { scenario } from 'k6/execution';
 import http from 'k6/http';
 
-const data = new SharedArray('requests', function () {
-  // return JSON.parse(open('./data/requests.json'));
-  return JSON.parse(open('../data/requests.json')).filter((it) => !it.startsWith('/search'));
+const data = new SharedArray("requests", function () {
+  // run with all kinds of requests
+  // return JSON.parse(open("../data/requests.json"));
+  // or run without search requests (which are quite costly on the DB and not supported by all DBs)
+  return JSON.parse(open("../data/requests.json")).filter(
+    (it) => !it.startsWith("/search")
+  );
 });
 
 const host = __ENV.HOST || `http://192.168.31.144:3000`; // drizzle

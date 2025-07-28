@@ -55,3 +55,5 @@ pnpm start:prisma:node
 3. Replace `<test-machine-ip>` with the address of your test machine from above and run:
    For Drizzle: `pnpm bench --host http://<test-machine-ip>:3000 --name drizzle`
    For Prisma: `pnpm bench --host http://<test-machine-ip>:3001 --name prisma`
+
+Note that you can run the tests with or without search queries. Search queries are not supported by all databases and have a significant performance impact. See `./bench/bench.js`.
