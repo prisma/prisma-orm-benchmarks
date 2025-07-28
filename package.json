@@ -10,9 +10,11 @@
     "start:seed:sqlite": "tsx ./src/sqlite/seed.ts",
     "start:generate": "tsx ./src/generate.ts",
     "prepare:prisma": "prisma generate --schema src/schema.prisma",
+    "prepare:prisma:query-compiler": "prisma generate --schema src/schema-query-compiler.prisma",
     "prepare:prisma:sqlite": "prisma generate --schema src/sqlite/schema.prisma",
     "start:prisma:node": "tsx ./src/prisma-server-node.ts",
     "start:prisma:bun": "tsx ./src/prisma-server-bun.ts",
+    "start:prisma:query-compiler": "tsx ./src/prisma-server-query-compiler.ts",
     "start:drizzle:node": "tsx ./src/drizzle-server-node.ts",
     "start:drizzle:bun": "tsx ./src/drizzle-server-bun.ts"
   },
@@ -44,6 +46,7 @@
   "dependencies": {
     "@hono/node-server": "^1.1.1",
     "@prisma/client": "6.12.0",
+    "@prisma/adapter-pg": "6.12.0",
     "axios": "^1.4.0",
     "better-sqlite3": "^11.2.1",
     "concurrently": "^8.2.2",
