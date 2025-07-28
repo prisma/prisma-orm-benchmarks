@@ -14,10 +14,8 @@ import {
   suppliers,
 } from "./schema";
 import "dotenv/config";
-import cluster from 'cluster';
-import os from "os"
-
-const numCPUs = os.cpus().length;
+import cluster from "cluster";
+import numWorkers from "./num-workers";
 
 const pool = new pg.native.Pool({ connectionString: process.env.DATABASE_URL, max: 8, min: 8 });
 const db = drizzle(pool, { schema, logger: false });
@@ -236,7 +234,7 @@ if (cluster.isPrimary) {
   console.log(`Primary ${process.pid} is running`);
 
   //Fork workers
-  for (let i = 0; i < numCPUs; i++) {
+  for (let i = 0; i < numWorkers; i++) {
     cluster.fork();
   }
 

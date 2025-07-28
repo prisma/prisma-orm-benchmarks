@@ -15,13 +15,12 @@ import {
 import "dotenv/config";
 import cluster from "cluster";
 import os from "os";
-
-const numCPUs = os.cpus().length;
+import numWorkers from "./num-workers";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  max: numCPUs * 2,
-  min: numCPUs * 2,
+  max: numWorkers * 2,
+  min: numWorkers * 2,
 });
 const db = drizzle(pool, { schema, logger: false });
 
@@ -240,7 +239,7 @@ app.get("/order-with-details-and-products", async (c) => {
 if (cluster.isPrimary) {
   console.log(`Primary ${process.pid} is running`);
   //Fork workers
-  for (let i = 0; i < numCPUs; i++) {
+  for (let i = 0; i < numWorkers; i++) {
     cluster.fork();
   }
 

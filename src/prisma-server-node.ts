@@ -3,9 +3,8 @@ import { Hono } from "hono";
 import { PrismaClient } from "@prisma/client";
 import cpuUsage from "./cpu-usage";
 
-import cluster from 'cluster';
-import os from "os"
-const numCPUs = os.cpus().length;
+import cluster from "cluster";
+import numWorkers from "./num-workers";
 
 const prisma = new PrismaClient();
 
@@ -211,7 +210,7 @@ if (cluster.isPrimary) {
   console.log(`Primary ${process.pid} is running`);
 
   //Fork workers
-  for (let i=0; i < 2; i++) {
+  for (let i = 0; i < numWorkers; i++) {
     cluster.fork();
   }
 

@@ -204,6 +204,8 @@ app.get("/order-with-details-and-products", async (c) => {
   return c.json(result);
 });
 
+// TODO: drizzle bun uses multiple workers, but prisma bun does not?!
+
 export default {
   fetch: app.fetch,
   port: 3001,
