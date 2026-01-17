@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Drizzle vs Prisma Benchmark Visualization</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    Oxygen, Ubuntu, sans-serif;
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                min-height: 100vh;
+                color: #e0e0e0;
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+                background: linear-gradient(90deg, #00d9ff, #00ff88);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin-bottom: 10px;
+            }
+
+            .subtitle {
+                color: #888;
+                font-size: 1.1rem;
+            }
+
+            .controls {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                padding: 20px;
+                margin-bottom: 20px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .control-group label {
+                font-size: 0.85rem;
+                color: #aaa;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            select,
+            button {
+                padding: 10px 16px;
+                border-radius: 8px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                background: rgba(255, 255, 255, 0.1);
+                color: #fff;
+                font-size: 0.95rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            select:hover,
+            button:hover {
+                background: rgba(255, 255, 255, 0.2);
+                border-color: #00d9ff;
+            }
+
+            select:focus,
+            button:focus {
+                outline: none;
+                border-color: #00d9ff;
+                box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+            }
+
+            .btn-primary {
+                background: linear-gradient(90deg, #00d9ff, #00ff88);
+                border: none;
+                color: #1a1a2e;
+                font-weight: 600;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4);
+            }
+
+            .chart-container {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                padding: 20px;
+                margin-bottom: 20px;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .chart-title {
+                font-size: 1.3rem;
+                margin-bottom: 15px;
+                color: #fff;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .chart-title::before {
+                content: "";
+                display: inline-block;
+                width: 4px;
+                height: 24px;
+                background: linear-gradient(180deg, #00d9ff, #00ff88);
+                border-radius: 2px;
+            }
+
+            .chart-wrapper {
+                position: relative;
+                height: 400px;
+            }
+
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .stat-card {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                padding: 20px;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .stat-card h3 {
+                font-size: 0.9rem;
+                color: #888;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 10px;
+            }
+
+            .stat-values {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .stat-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .stat-label {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .stat-color {
+                width: 12px;
+                height: 12px;
+                border-radius: 3px;
+            }
+
+            .stat-value {
+                font-size: 1.2rem;
+                font-weight: 600;
+            }
+
+            .legend-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 16px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 20px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                border: 1px solid transparent;
+            }
+
+            .legend-item:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .legend-item.active {
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+
+            .legend-item.inactive {
+                opacity: 0.4;
+            }
+
+            .legend-color {
+                width: 16px;
+                height: 16px;
+                border-radius: 4px;
+            }
+
+            .loading {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 400px;
+                font-size: 1.2rem;
+                color: #888;
+            }
+
+            .loading::after {
+                content: "";
+                width: 30px;
+                height: 30px;
+                border: 3px solid rgba(255, 255, 255, 0.1);
+                border-top-color: #00d9ff;
+                border-radius: 50%;
+                margin-left: 15px;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .tabs {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .tab {
+                padding: 12px 24px;
+                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .tab:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .tab.active {
+                background: linear-gradient(
+                    90deg,
+                    rgba(0, 217, 255, 0.2),
+                    rgba(0, 255, 136, 0.2)
+                );
+                border-color: #00d9ff;
+            }
+
+            .comparison-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 15px;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .comparison-table th {
+                color: #888;
+                font-weight: 500;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                letter-spacing: 1px;
+            }
+
+            .comparison-table tr:hover {
+                background: rgba(255, 255, 255, 0.03);
+            }
+
+            .winner {
+                color: #00ff88;
+                font-weight: 600;
+            }
+
+            .info-text {
+                text-align: center;
+                color: #666;
+                font-size: 0.9rem;
+                margin-top: 10px;
+            }
+
+            @media (max-width: 768px) {
+                h1 {
+                    font-size: 1.8rem;
+                }
+
+                .controls {
+                    flex-direction: column;
+                }
+
+                .chart-wrapper {
+                    height: 300px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>🚀 ORM Benchmark Dashboard</h1>
+                <p class="subtitle">
+                    End-to-End Application Performance with Prisma ORM
+                </p>
+            </header>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label>Metric</label>
+                    <select id="metricSelect">
+                        <option value="reqs_per_sec">
+                            Requests per Second
+                        </option>
+                        <option value="latency_average">
+                            Average Latency (ms)
+                        </option>
+                        <option value="latency_90">P90 Latency (ms)</option>
+                        <option value="latency_95">P95 Latency (ms)</option>
+                        <option value="latency_99">P99 Latency (ms)</option>
+                        <option value="cpu">CPU Usage (%)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>X-Axis</label>
+                    <select id="xAxisSelect">
+                        <option value="seconds">Time (seconds)</option>
+                        <option value="vus">Virtual Users (VUs)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>Time Range</label>
+                    <select id="rangeSelect">
+                        <option value="all">All Data</option>
+                        <option value="first100">First 100 points</option>
+                        <option value="last100">Last 100 points</option>
+                        <option value="middle">Middle Section</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>Smoothing</label>
+                    <select id="smoothingSelect">
+                        <option value="1">None</option>
+                        <option value="5" selected>5-point</option>
+                        <option value="10">10-point</option>
+                        <option value="20">20-point</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button class="btn-primary" onclick="resetZoom()">
+                        Reset Zoom
+                    </button>
+                </div>
+            </div>
+
+            <div class="legend-container" id="legendContainer"></div>
+
+            <div class="stats-grid" id="statsGrid">
+                <!-- Stats will be inserted here -->
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" data-view="timeseries">Time Series</div>
+                <div class="tab" data-view="comparison">Comparison</div>
+                <div class="tab" data-view="distribution">Distribution</div>
+            </div>
+
+            <div id="timeseriesView">
+                <div class="chart-container">
+                    <div class="chart-title">Performance Over Time</div>
+                    <div class="chart-wrapper">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                    <p class="info-text">
+                        💡 Use scroll to zoom, drag to pan. Click legend items
+                        to toggle visibility.
+                    </p>
+                </div>
+            </div>
+
+            <div id="comparisonView" style="display: none">
+                <div class="chart-container">
+                    <div class="chart-title">
+                        Average Performance Comparison
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Detailed Metrics</div>
+                    <table class="comparison-table" id="comparisonTable">
+                        <!-- Table will be populated dynamically -->
+                    </table>
+                </div>
+            </div>
+
+            <div id="distributionView" style="display: none">
+                <div class="chart-container">
+                    <div class="chart-title">Latency Distribution</div>
+                    <div class="chart-wrapper">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Color scheme for different implementations
+            const colors = {
+                // drizzle: {
+                //     bg: "rgba(0, 217, 255, 0.2)",
+                //     border: "#00d9ff",
+                //     name: "Drizzle",
+                // },
+                prisma: {
+                    bg: "rgba(255, 99, 132, 0.2)",
+                    border: "#ff6384",
+                    name: "Prisma 7.3",
+                },
+                "prisma-7.4": {
+                    bg: "rgba(0, 255, 136, 0.2)",
+                    border: "#00ff88",
+                    name: "Prisma 7.4 (Query Plan Cache)",
+                },
+                "prisma6-native": {
+                    bg: "rgba(255, 206, 86, 0.2)",
+                    border: "#ffce56",
+                    name: "Prisma 6",
+                },
+                // "prisma6-adapter-pg": {
+                //     bg: "rgba(255, 159, 64, 0.2)",
+                //     border: "#ff9f40",
+                //     name: "Prisma 6 (driver adapter)",
+                // },
+            };
+
+            let data = null;
+            let mainChart = null;
+            let comparisonChart = null;
+            let distributionChart = null;
+            let activeDatasets = new Set(Object.keys(colors));
+
+            // Load data
+            async function loadData() {
+                try {
+                    const response = await fetch("data.json");
+                    data = await response.json();
+                    initializeCharts();
+                    updateStats();
+                    createLegend();
+                } catch (error) {
+                    console.error("Error loading data:", error);
+                    document.querySelector(".chart-wrapper").innerHTML =
+                        '<div class="loading" style="color: #ff6384;">Error loading data. Make sure data.json is in the same directory.</div>';
+                }
+            }
+
+            function smoothData(arr, windowSize) {
+                if (windowSize <= 1) return arr;
+                const result = [];
+                for (let i = 0; i < arr.length; i++) {
+                    let sum = 0;
+                    let count = 0;
+                    for (
+                        let j = Math.max(0, i - Math.floor(windowSize / 2));
+                        j <=
+                        Math.min(
+                            arr.length - 1,
+                            i + Math.floor(windowSize / 2),
+                        );
+                        j++
+                    ) {
+                        if (arr[j] !== null && arr[j] !== undefined) {
+                            sum += arr[j];
+                            count++;
+                        }
+                    }
+                    result.push(count > 0 ? sum / count : null);
+                }
+                return result;
+            }
+
+            function getDataRange(dataArray) {
+                const range = document.getElementById("rangeSelect").value;
+                const len = dataArray.length;
+                switch (range) {
+                    case "first100":
+                        return dataArray.slice(0, 100);
+                    case "last100":
+                        return dataArray.slice(-100);
+                    case "middle":
+                        return dataArray.slice(
+                            Math.floor(len / 4),
+                            Math.floor((3 * len) / 4),
+                        );
+                    default:
+                        return dataArray;
+                }
+            }
+
+            function getMetricData(impl, metric) {
+                const implData = data[impl];
+                if (!implData) return [];
+
+                if (metric === "cpu") {
+                    return implData.map(
+                        (d) => (d.core1 + d.core2 + d.core3 + d.core4) / 4,
+                    );
+                }
+                return implData.map((d) => d[metric]);
+            }
+
+            function getVUForSecond(second) {
+                const stages = [
+                    { duration: 5, target: 200 },
+                    { duration: 15, target: 200 },
+                    { duration: 5, target: 400 },
+                    { duration: 15, target: 400 },
+                    { duration: 5, target: 600 },
+                    { duration: 15, target: 600 },
+                    { duration: 5, target: 800 },
+                    { duration: 15, target: 800 },
+                    { duration: 5, target: 1000 },
+                    { duration: 15, target: 1000 },
+                    { duration: 5, target: 1200 },
+                    { duration: 15, target: 1200 },
+                    { duration: 5, target: 1400 },
+                    { duration: 15, target: 1400 },
+                    { duration: 5, target: 1600 },
+                    { duration: 15, target: 1600 },
+                    { duration: 5, target: 1800 },
+                    { duration: 15, target: 1800 },
+                    { duration: 5, target: 2000 },
+                    { duration: 15, target: 2000 },
+                    { duration: 5, target: 2200 },
+                    { duration: 15, target: 2200 },
+                    { duration: 5, target: 2400 },
+                    { duration: 15, target: 2400 },
+                    { duration: 5, target: 2600 },
+                    { duration: 15, target: 2600 },
+                    { duration: 5, target: 2800 },
+                    { duration: 15, target: 2800 },
+                    { duration: 5, target: 3000 },
+                    { duration: 55, target: 3000 },
+                ];
+
+                let elapsed = 0;
+
+                for (const stage of stages) {
+                    if (second < elapsed + stage.duration) {
+                        return stage.target;
+                    }
+                    elapsed += stage.duration;
+                }
+
+                return stages[stages.length - 1].target;
+            }
+
+            function initializeCharts() {
+                const ctx = document
+                    .getElementById("mainChart")
+                    .getContext("2d");
+                const metric = document.getElementById("metricSelect").value;
+                const smoothing = parseInt(
+                    document.getElementById("smoothingSelect").value,
+                );
+
+                const datasets = Object.keys(colors).map((impl) => {
+                    const rawData = getDataRange(getMetricData(impl, metric));
+                    const smoothedData = smoothData(rawData, smoothing);
+                    return {
+                        label: colors[impl].name,
+                        data: smoothedData,
+                        borderColor: colors[impl].border,
+                        backgroundColor: colors[impl].bg,
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        hidden: !activeDatasets.has(impl),
+                        implKey: impl,
+                    };
+                });
+
+                const xAxisMode = document.getElementById("xAxisSelect").value;
+                const labels = getDataRange(data[Object.keys(data)[0]]).map(
+                    (_, i) => (xAxisMode === "vus" ? getVUForSecond(i) : i),
+                );
+
+                if (mainChart) {
+                    mainChart.destroy();
+                }
+
+                mainChart = new Chart(ctx, {
+                    type: "line",
+                    data: { labels, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: "index",
+                            intersect: false,
+                        },
+                        plugins: {
+                            legend: {
+                                display: false,
+                            },
+                            tooltip: {
+                                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                titleColor: "#fff",
+                                bodyColor: "#fff",
+                                borderColor: "rgba(255, 255, 255, 0.1)",
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function (context) {
+                                        const value = context.parsed.y;
+                                        if (value === null) return "";
+                                        return `${context.dataset.label}: ${value.toFixed(2)}`;
+                                    },
+                                },
+                            },
+                            zoom: {
+                                zoom: {
+                                    wheel: { enabled: true },
+                                    pinch: { enabled: true },
+                                    mode: "xy",
+                                },
+                                pan: {
+                                    enabled: true,
+                                    mode: "xy",
+                                },
+                            },
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: "rgba(255, 255, 255, 0.05)",
+                                },
+                                ticks: {
+                                    color: "#888",
+                                    maxTicksLimit: 10,
+                                },
+                                title: {
+                                    display: true,
+                                    text:
+                                        document.getElementById("xAxisSelect")
+                                            .value === "vus"
+                                            ? "Virtual Users (VUs)"
+                                            : "Time (seconds)",
+                                    color: "#888",
+                                },
+                            },
+                            y: {
+                                grid: {
+                                    color: "rgba(255, 255, 255, 0.05)",
+                                },
+                                ticks: {
+                                    color: "#888",
+                                },
+                                title: {
+                                    display: true,
+                                    text: getYAxisLabel(),
+                                    color: "#888",
+                                },
+                            },
+                        },
+                    },
+                });
+
+                initComparisonChart();
+                initDistributionChart();
+            }
+
+            function getYAxisLabel() {
+                const metric = document.getElementById("metricSelect").value;
+                switch (metric) {
+                    case "reqs_per_sec":
+                        return "Requests/Second";
+                    case "cpu":
+                        return "CPU Usage (%)";
+                    default:
+                        return "Latency (ms)";
+                }
+            }
+
+            function initComparisonChart() {
+                const ctx = document
+                    .getElementById("comparisonChart")
+                    .getContext("2d");
+                const metric = document.getElementById("metricSelect").value;
+
+                const avgData = Object.keys(colors).map((impl) => {
+                    const values = getMetricData(impl, metric).filter(
+                        (v) => v !== null && v !== undefined,
+                    );
+                    return values.length > 0
+                        ? values.reduce((a, b) => a + b, 0) / values.length
+                        : 0;
+                });
+
+                if (comparisonChart) {
+                    comparisonChart.destroy();
+                }
+
+                comparisonChart = new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: Object.values(colors).map((c) => c.name),
+                        datasets: [
+                            {
+                                data: avgData,
+                                backgroundColor: Object.values(colors).map(
+                                    (c) => c.bg,
+                                ),
+                                borderColor: Object.values(colors).map(
+                                    (c) => c.border,
+                                ),
+                                borderWidth: 2,
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: "rgba(255, 255, 255, 0.05)" },
+                                ticks: { color: "#888" },
+                            },
+                            x: {
+                                grid: { color: "rgba(255, 255, 255, 0.05)" },
+                                ticks: { color: "#888" },
+                            },
+                        },
+                    },
+                });
+
+                updateComparisonTable();
+            }
+
+            function initDistributionChart() {
+                const ctx = document
+                    .getElementById("distributionChart")
+                    .getContext("2d");
+
+                // Create histogram data for latency
+                const histogramData = Object.keys(colors).map((impl) => {
+                    const p90 = getMetricData(impl, "latency_90");
+                    const p95 = getMetricData(impl, "latency_95");
+                    const p99 = getMetricData(impl, "latency_99");
+
+                    const avg = (arr) =>
+                        arr.filter((v) => v).reduce((a, b) => a + b, 0) /
+                        arr.filter((v) => v).length;
+
+                    return {
+                        label: colors[impl].name,
+                        data: [avg(p90), avg(p95), avg(p99)],
+                        backgroundColor: colors[impl].bg,
+                        borderColor: colors[impl].border,
+                        borderWidth: 2,
+                    };
+                });
+
+                if (distributionChart) {
+                    distributionChart.destroy();
+                }
+
+                distributionChart = new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: ["P90", "P95", "P99"],
+                        datasets: histogramData,
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: "top",
+                                labels: { color: "#888" },
+                            },
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: "rgba(255, 255, 255, 0.05)" },
+                                ticks: { color: "#888" },
+                                title: {
+                                    display: true,
+                                    text: "Latency (ms)",
+                                    color: "#888",
+                                },
+                            },
+                            x: {
+                                grid: { color: "rgba(255, 255, 255, 0.05)" },
+                                ticks: { color: "#888" },
+                            },
+                        },
+                    },
+                });
+            }
+
+            function updateComparisonTable() {
+                const table = document.getElementById("comparisonTable");
+                const metrics = [
+                    "reqs_per_sec",
+                    "latency_average",
+                    "latency_90",
+                    "latency_95",
+                    "latency_99",
+                ];
+                const metricNames = [
+                    "Requests/sec",
+                    "Avg Latency",
+                    "P90 Latency",
+                    "P95 Latency",
+                    "P99 Latency",
+                ];
+
+                let html = "<tr><th>Metric</th>";
+                Object.values(colors).forEach((c) => {
+                    html += `<th>${c.name}</th>`;
+                });
+                html += "<th>Best</th></tr>";
+
+                metrics.forEach((metric, idx) => {
+                    html += `<tr><td>${metricNames[idx]}</td>`;
+
+                    const values = {};
+                    Object.keys(colors).forEach((impl) => {
+                        const data = getMetricData(impl, metric).filter(
+                            (v) => v !== null && v !== undefined,
+                        );
+                        values[impl] =
+                            data.length > 0
+                                ? data.reduce((a, b) => a + b, 0) / data.length
+                                : 0;
+                    });
+
+                    // Determine winner (higher is better for reqs_per_sec, lower for latency)
+                    let winner;
+                    if (metric === "reqs_per_sec") {
+                        winner = Object.keys(values).reduce((a, b) =>
+                            values[a] > values[b] ? a : b,
+                        );
+                    } else {
+                        winner = Object.keys(values).reduce((a, b) =>
+                            values[a] < values[b] ? a : b,
+                        );
+                    }
+
+                    Object.keys(colors).forEach((impl) => {
+                        const isWinner = impl === winner;
+                        const val = values[impl].toFixed(2);
+                        html += `<td class="${isWinner ? "winner" : ""}">${val}</td>`;
+                    });
+
+                    html += `<td class="winner">${colors[winner].name}</td></tr>`;
+                });
+
+                table.innerHTML = html;
+            }
+
+            function updateStats() {
+                const metric = document.getElementById("metricSelect").value;
+                const statsGrid = document.getElementById("statsGrid");
+
+                let html = "";
+
+                // Calculate stats for current metric
+                Object.keys(colors).forEach((impl) => {
+                    const values = getMetricData(impl, metric).filter(
+                        (v) => v !== null && v !== undefined,
+                    );
+                    if (values.length === 0) return;
+
+                    const avg =
+                        values.reduce((a, b) => a + b, 0) / values.length;
+                    const max = Math.max(...values);
+                    const min = Math.min(...values);
+
+                    html += `
+                    <div class="stat-card">
+                        <h3>${colors[impl].name}</h3>
+                        <div class="stat-values">
+                            <div class="stat-row">
+                                <span class="stat-label">
+                                    <span class="stat-color" style="background: ${colors[impl].border}"></span>
+                                    Average
+                                </span>
+                                <span class="stat-value">${avg.toFixed(2)}</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Max</span>
+                                <span class="stat-value">${max.toFixed(2)}</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Min</span>
+                                <span class="stat-value">${min.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                });
+
+                statsGrid.innerHTML = html;
+            }
+
+            function createLegend() {
+                const container = document.getElementById("legendContainer");
+                let html = "";
+
+                Object.keys(colors).forEach((impl) => {
+                    const isActive = activeDatasets.has(impl);
+                    html += `
+                    <div class="legend-item ${isActive ? "active" : "inactive"}" data-impl="${impl}">
+                        <span class="legend-color" style="background: ${colors[impl].border}"></span>
+                        <span>${colors[impl].name}</span>
+                    </div>
+                `;
+                });
+
+                container.innerHTML = html;
+
+                // Add click handlers
+                container.querySelectorAll(".legend-item").forEach((item) => {
+                    item.addEventListener("click", () => {
+                        const impl = item.dataset.impl;
+                        if (activeDatasets.has(impl)) {
+                            activeDatasets.delete(impl);
+                            item.classList.remove("active");
+                            item.classList.add("inactive");
+                        } else {
+                            activeDatasets.add(impl);
+                            item.classList.add("active");
+                            item.classList.remove("inactive");
+                        }
+                        updateChartVisibility();
+                    });
+                });
+            }
+
+            function updateChartVisibility() {
+                if (!mainChart) return;
+                mainChart.data.datasets.forEach((dataset) => {
+                    dataset.hidden = !activeDatasets.has(dataset.implKey);
+                });
+                mainChart.update();
+            }
+
+            function resetZoom() {
+                if (mainChart) {
+                    mainChart.resetZoom();
+                }
+            }
+
+            // Event listeners
+            document
+                .getElementById("metricSelect")
+                .addEventListener("change", () => {
+                    initializeCharts();
+                    updateStats();
+                });
+
+            document
+                .getElementById("xAxisSelect")
+                .addEventListener("change", initializeCharts);
+            document
+                .getElementById("rangeSelect")
+                .addEventListener("change", initializeCharts);
+            document
+                .getElementById("smoothingSelect")
+                .addEventListener("change", initializeCharts);
+
+            // Tab switching
+            document.querySelectorAll(".tab").forEach((tab) => {
+                tab.addEventListener("click", () => {
+                    document
+                        .querySelectorAll(".tab")
+                        .forEach((t) => t.classList.remove("active"));
+                    tab.classList.add("active");
+
+                    const view = tab.dataset.view;
+                    document.getElementById("timeseriesView").style.display =
+                        view === "timeseries" ? "block" : "none";
+                    document.getElementById("comparisonView").style.display =
+                        view === "comparison" ? "block" : "none";
+                    document.getElementById("distributionView").style.display =
+                        view === "distribution" ? "block" : "none";
+                });
+            });
+
+            // Initialize on load
+            loadData();
+        </script>
+    </body>
+</html>

@@ -11,7 +11,10 @@ import os from "os";
 const numCPUs = os.cpus().length;
 
 // const pool = new pg.native!.Pool({ connectionString: process.env.DATABASE_URL, max: 8, min: 8 });
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+  min: 10,
+});
 // const adapter = new PrismaPg(pool); // when pool provided - doesnt work
 const prisma = new PrismaClient({ adapter });
 
