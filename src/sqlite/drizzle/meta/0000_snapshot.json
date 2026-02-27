@@ -173,7 +173,15 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "order_details_pkey": {
+          "name": "order_details_pkey",
+          "columns": [
+            "order_id",
+            "product_id"
+          ]
+        }
+      },
       "uniqueConstraints": {}
     },
     "employees": {

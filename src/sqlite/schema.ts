@@ -1,5 +1,5 @@
 import { InferModel, relations } from 'drizzle-orm';
-import { sqliteTable, foreignKey, integer, index, text, numeric } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, foreignKey, integer, index, primaryKey, text, numeric } from 'drizzle-orm/sqlite-core';
 
 export const customers = sqliteTable('customers', {
   id: integer('id').primaryKey({
@@ -128,6 +128,7 @@ export const details = sqliteTable(
   },
   (t) => {
     return {
+      pk: primaryKey({ columns: [t.orderId, t.productId] }),
       orderIdIdx: index('order_id_idx').on(t.orderId),
       productIdIdx: index('product_id_idx').on(t.productId),
     };

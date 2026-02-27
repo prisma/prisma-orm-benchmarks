@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "d28884aa-2629-4191-94a9-bfe978f3fcd7",
+  "id": "d1eca2e0-1f43-4918-b5db-291d94a2554f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "customers": {
@@ -159,7 +159,15 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "order_details_pkey": {
+          "name": "order_details_pkey",
+          "columns": [
+            "order_id",
+            "product_id"
+          ]
+        }
+      },
       "uniqueConstraints": {}
     },
     "employees": {

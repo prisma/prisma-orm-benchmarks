@@ -38,6 +38,9 @@ pnpm start:drizzle
 ## Prisma
 pnpm prepare:prisma
 pnpm start:prisma
+
+## Prisma Next (`@prisma-next/sql-orm-client@0.3.0-dev.41`)
+pnpm start:prisma-next
 ```
 
 ## Prepare testing machine
@@ -50,6 +53,7 @@ tsx bench/index --host http://192.168.31.144:3000 --name my-bench --folder resul
 
 http://192.168.31.144:3000 // drizzle
 http://192.168.31.144:3001 // prisma
+http://192.168.31.144:3003 // prisma-next
 ```
 4. Prepare final combined results  
 After benchmarks finish, merge all outputs into a single JSON file:

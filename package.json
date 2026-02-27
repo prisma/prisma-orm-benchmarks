@@ -5,14 +5,17 @@
   "main": "index.js",
   "scripts": {
     "bench": "tsx bench/index.ts --host http://localhost:3001 --name prisma-7.4 --folder results",
+    "bench:prisma-next": "tsx bench/index.ts --host http://localhost:3003 --name prisma-next-0.3.0-dev.41 --folder results",
     "start:docker": "tsx ./src/docker.ts",
     "start:seed": "tsx ./src/seed.ts",
     "start:seed:sqlite": "tsx ./src/sqlite/seed.ts",
     "start:generate": "tsx ./src/generate.ts",
     "prepare:prisma": "prisma generate --schema src/schema.prisma",
     "prepare:prisma:sqlite": "prisma generate --schema src/sqlite/schema.prisma",
+    "prepare:prisma-next": "prisma-next db sign",
     "start:prisma": "tsx ./src/prisma-server-node.ts",
-    "start:drizzle": "tsx ./src/drizzle-server-node.ts"
+    "start:drizzle": "tsx ./src/drizzle-server-node.ts",
+    "start:prisma-next": "tsx ./src/prisma-next-server-node.mts"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +23,9 @@
   "devDependencies": {
     "@balena/dockerignore": "^1.0.2",
     "@faker-js/faker": "^8.0.2",
+    "@prisma-next/cli": "0.3.0-dev.41",
+    "@prisma-next/driver-postgres": "0.3.0-dev.41",
+    "@prisma-next/family-sql": "0.3.0-dev.41",
     "@types/better-sqlite3": "^7.6.11",
     "@types/bun": "^1.1.6",
     "@types/deep-diff": "^1.0.2",
@@ -41,6 +47,11 @@
   "dependencies": {
     "@duckdb/node-api": "1.4.2-r.1",
     "@hono/node-server": "^1.19.6",
+    "@prisma-next/adapter-postgres": "0.3.0-dev.41",
+    "@prisma-next/postgres": "0.3.0-dev.41",
+    "@prisma-next/sql-contract-ts": "0.3.0-dev.41",
+    "@prisma-next/sql-orm-client": "0.3.0-dev.41",
+    "@prisma-next/target-postgres": "0.3.0-dev.41",
     "@prisma/adapter-pg": "7.4.0",
     "@prisma/client": "7.4.0",
     "axios": "^1.4.0",

@@ -81,7 +81,7 @@ model Detail {
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "order_details_order_id_orders_id_fk")
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "order_details_product_id_products_id_fk")
 
-  @@unique([orderId, productId])
+  @@id([orderId, productId], map: "order_details_pkey")
   @@map("order_details")
 }
 

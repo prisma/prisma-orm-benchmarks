@@ -15,6 +15,13 @@
       "when": 1691941522899,
       "tag": "0001_concerned_mother_askani",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1772150000000,
+      "tag": "0002_order_details_composite_primary_key",
+      "breakpoints": true
     }
   ]
 }

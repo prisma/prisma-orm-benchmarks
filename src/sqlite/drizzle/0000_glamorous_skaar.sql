@@ -18,6 +18,7 @@ CREATE TABLE `order_details` (
 	`discount` numeric NOT NULL,
 	`order_id` integer NOT NULL,
 	`product_id` integer NOT NULL,
+	PRIMARY KEY(`order_id`, `product_id`),
 	FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE cascade
 );

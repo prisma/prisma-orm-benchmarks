@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS "order_details" (
 	"quantity" integer NOT NULL,
 	"discount" double precision NOT NULL,
 	"order_id" integer NOT NULL,
-	"product_id" integer NOT NULL
+	"product_id" integer NOT NULL,
+	CONSTRAINT "order_details_pkey" PRIMARY KEY("order_id","product_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "employees" (

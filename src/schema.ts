@@ -1,4 +1,4 @@
-import { pgTable, varchar, date, text, foreignKey, integer, doublePrecision, index, serial } from 'drizzle-orm/pg-core';
+import { pgTable, varchar, date, text, foreignKey, integer, doublePrecision, index, primaryKey, serial } from 'drizzle-orm/pg-core';
 
 export const customers = pgTable('customers', {
   id: serial('id').primaryKey(),
@@ -117,6 +117,7 @@ export const details = pgTable(
   },
   (t) => {
     return {
+      pk: primaryKey({ columns: [t.orderId, t.productId], name: 'order_details_pkey' }),
       orderIdIdx: index('order_id_idx').on(t.orderId),
       productIdIdx: index('product_id_idx').on(t.productId),
     };

@@ -1,0 +1,872 @@
+{
+  "schemaVersion": "1",
+  "targetFamily": "sql",
+  "target": "postgres",
+  "storageHash": "sha256:b55c3b0cb095230b08c1bfd697b19f1ce06c839bb6f11446cb418a4cb986c5f1",
+  "profileHash": "sha256:54639207001dcf5237ca394accf5672c99ceb7060eeed0687668bc19e5aff7f9",
+  "models": {
+    "Customer": {
+      "fields": {
+        "address": {
+          "column": "address"
+        },
+        "city": {
+          "column": "city"
+        },
+        "companyName": {
+          "column": "company_name"
+        },
+        "contactName": {
+          "column": "contact_name"
+        },
+        "contactTitle": {
+          "column": "contact_title"
+        },
+        "country": {
+          "column": "country"
+        },
+        "fax": {
+          "column": "fax"
+        },
+        "id": {
+          "column": "id"
+        },
+        "phone": {
+          "column": "phone"
+        },
+        "postalCode": {
+          "column": "postal_code"
+        },
+        "region": {
+          "column": "region"
+        }
+      },
+      "relations": {},
+      "storage": {
+        "table": "customers"
+      }
+    },
+    "Detail": {
+      "fields": {
+        "discount": {
+          "column": "discount"
+        },
+        "orderId": {
+          "column": "order_id"
+        },
+        "productId": {
+          "column": "product_id"
+        },
+        "quantity": {
+          "column": "quantity"
+        },
+        "unitPrice": {
+          "column": "unit_price"
+        }
+      },
+      "relations": {},
+      "storage": {
+        "table": "order_details"
+      }
+    },
+    "Employee": {
+      "fields": {
+        "address": {
+          "column": "address"
+        },
+        "birthDate": {
+          "column": "birth_date"
+        },
+        "city": {
+          "column": "city"
+        },
+        "country": {
+          "column": "country"
+        },
+        "extension": {
+          "column": "extension"
+        },
+        "firstName": {
+          "column": "first_name"
+        },
+        "hireDate": {
+          "column": "hire_date"
+        },
+        "homePhone": {
+          "column": "home_phone"
+        },
+        "id": {
+          "column": "id"
+        },
+        "lastName": {
+          "column": "last_name"
+        },
+        "notes": {
+          "column": "notes"
+        },
+        "postalCode": {
+          "column": "postal_code"
+        },
+        "recipientId": {
+          "column": "recipient_id"
+        },
+        "title": {
+          "column": "title"
+        },
+        "titleOfCourtesy": {
+          "column": "title_of_courtesy"
+        }
+      },
+      "relations": {},
+      "storage": {
+        "table": "employees"
+      }
+    },
+    "Order": {
+      "fields": {
+        "customerId": {
+          "column": "customer_id"
+        },
+        "employeeId": {
+          "column": "employee_id"
+        },
+        "freight": {
+          "column": "freight"
+        },
+        "id": {
+          "column": "id"
+        },
+        "orderDate": {
+          "column": "order_date"
+        },
+        "requiredDate": {
+          "column": "required_date"
+        },
+        "shipCity": {
+          "column": "ship_city"
+        },
+        "shipCountry": {
+          "column": "ship_country"
+        },
+        "shipName": {
+          "column": "ship_name"
+        },
+        "shipPostalCode": {
+          "column": "ship_postal_code"
+        },
+        "shipRegion": {
+          "column": "ship_region"
+        },
+        "shipVia": {
+          "column": "ship_via"
+        },
+        "shippedDate": {
+          "column": "shipped_date"
+        }
+      },
+      "relations": {},
+      "storage": {
+        "table": "orders"
+      }
+    },
+    "Product": {
+      "fields": {
+        "discontinued": {
+          "column": "discontinued"
+        },
+        "id": {
+          "column": "id"
+        },
+        "name": {
+          "column": "name"
+        },
+        "quantityPerUnit": {
+          "column": "qt_per_unit"
+        },
+        "reorderLevel": {
+          "column": "reorder_level"
+        },
+        "supplierId": {
+          "column": "supplier_id"
+        },
+        "unitPrice": {
+          "column": "unit_price"
+        },
+        "unitsInStock": {
+          "column": "units_in_stock"
+        },
+        "unitsOnOrder": {
+          "column": "units_on_order"
+        }
+      },
+      "relations": {},
+      "storage": {
+        "table": "products"
+      }
+    },
+    "Supplier": {
+      "fields": {
+        "address": {
+          "column": "address"
+        },
+        "city": {
+          "column": "city"
+        },
+        "companyName": {
+          "column": "company_name"
+        },
+        "contactName": {
+          "column": "contact_name"
+        },
+        "contactTitle": {
+          "column": "contact_title"
+        },
+        "country": {
+          "column": "country"
+        },
+        "id": {
+          "column": "id"
+        },
+        "phone": {
+          "column": "phone"
+        },
+        "postalCode": {
+          "column": "postal_code"
+        },
+        "region": {
+          "column": "region"
+        }
+      },
+      "relations": {},
+      "storage": {
+        "table": "suppliers"
+      }
+    }
+  },
+  "storage": {
+    "tables": {
+      "customers": {
+        "columns": {
+          "address": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "city": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "company_name": {
+            "codecId": "pg/text@1",
+            "nativeType": "text"
+          },
+          "contact_name": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "contact_title": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "country": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "fax": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying",
+            "nullable": true
+          },
+          "id": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "phone": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "postal_code": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying",
+            "nullable": true
+          },
+          "region": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying",
+            "nullable": true
+          }
+        },
+        "foreignKeys": [],
+        "indexes": [],
+        "primaryKey": {
+          "columns": [
+            "id"
+          ]
+        },
+        "uniques": []
+      },
+      "employees": {
+        "columns": {
+          "address": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "birth_date": {
+            "codecId": "pg/text@1",
+            "nativeType": "date"
+          },
+          "city": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "country": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "extension": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "first_name": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying",
+            "nullable": true
+          },
+          "hire_date": {
+            "codecId": "pg/text@1",
+            "nativeType": "date"
+          },
+          "home_phone": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "id": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "last_name": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "notes": {
+            "codecId": "pg/text@1",
+            "nativeType": "text"
+          },
+          "postal_code": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "recipient_id": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4",
+            "nullable": true
+          },
+          "title": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "title_of_courtesy": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          }
+        },
+        "foreignKeys": [
+          {
+            "columns": [
+              "recipient_id"
+            ],
+            "constraint": true,
+            "index": false,
+            "name": "employees_recipient_id_employees_id_fk",
+            "references": {
+              "columns": [
+                "id"
+              ],
+              "table": "employees"
+            }
+          }
+        ],
+        "indexes": [
+          {
+            "columns": [
+              "recipient_id"
+            ],
+            "name": "recepient_idx"
+          }
+        ],
+        "primaryKey": {
+          "columns": [
+            "id"
+          ]
+        },
+        "uniques": []
+      },
+      "order_details": {
+        "columns": {
+          "discount": {
+            "codecId": "pg/float8@1",
+            "nativeType": "float8"
+          },
+          "order_id": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "product_id": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "quantity": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "unit_price": {
+            "codecId": "pg/float8@1",
+            "nativeType": "float8"
+          }
+        },
+        "foreignKeys": [
+          {
+            "columns": [
+              "order_id"
+            ],
+            "constraint": true,
+            "index": false,
+            "name": "order_details_order_id_orders_id_fk",
+            "references": {
+              "columns": [
+                "id"
+              ],
+              "table": "orders"
+            }
+          },
+          {
+            "columns": [
+              "product_id"
+            ],
+            "constraint": true,
+            "index": false,
+            "name": "order_details_product_id_products_id_fk",
+            "references": {
+              "columns": [
+                "id"
+              ],
+              "table": "products"
+            }
+          }
+        ],
+        "indexes": [
+          {
+            "columns": [
+              "order_id"
+            ],
+            "name": "order_id_idx"
+          },
+          {
+            "columns": [
+              "product_id"
+            ],
+            "name": "product_id_idx"
+          }
+        ],
+        "primaryKey": {
+          "columns": [
+            "order_id",
+            "product_id"
+          ]
+        },
+        "uniques": []
+      },
+      "orders": {
+        "columns": {
+          "customer_id": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "employee_id": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "freight": {
+            "codecId": "pg/float8@1",
+            "nativeType": "float8"
+          },
+          "id": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "order_date": {
+            "codecId": "pg/text@1",
+            "nativeType": "date"
+          },
+          "required_date": {
+            "codecId": "pg/text@1",
+            "nativeType": "date"
+          },
+          "ship_city": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "ship_country": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "ship_name": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "ship_postal_code": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying",
+            "nullable": true
+          },
+          "ship_region": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying",
+            "nullable": true
+          },
+          "ship_via": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "shipped_date": {
+            "codecId": "pg/text@1",
+            "nativeType": "date",
+            "nullable": true
+          }
+        },
+        "foreignKeys": [
+          {
+            "columns": [
+              "customer_id"
+            ],
+            "constraint": true,
+            "index": false,
+            "name": "orders_customer_id_customers_id_fk",
+            "references": {
+              "columns": [
+                "id"
+              ],
+              "table": "customers"
+            }
+          },
+          {
+            "columns": [
+              "employee_id"
+            ],
+            "constraint": true,
+            "index": false,
+            "name": "orders_employee_id_employees_id_fk",
+            "references": {
+              "columns": [
+                "id"
+              ],
+              "table": "employees"
+            }
+          }
+        ],
+        "indexes": [],
+        "primaryKey": {
+          "columns": [
+            "id"
+          ]
+        },
+        "uniques": []
+      },
+      "products": {
+        "columns": {
+          "discontinued": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "id": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "name": {
+            "codecId": "pg/text@1",
+            "nativeType": "text"
+          },
+          "qt_per_unit": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "reorder_level": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "supplier_id": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "unit_price": {
+            "codecId": "pg/float8@1",
+            "nativeType": "float8"
+          },
+          "units_in_stock": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "units_on_order": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          }
+        },
+        "foreignKeys": [
+          {
+            "columns": [
+              "supplier_id"
+            ],
+            "constraint": true,
+            "index": false,
+            "name": "products_supplier_id_suppliers_id_fk",
+            "references": {
+              "columns": [
+                "id"
+              ],
+              "table": "suppliers"
+            }
+          }
+        ],
+        "indexes": [
+          {
+            "columns": [
+              "supplier_id"
+            ],
+            "name": "supplier_idx"
+          }
+        ],
+        "primaryKey": {
+          "columns": [
+            "id"
+          ]
+        },
+        "uniques": []
+      },
+      "suppliers": {
+        "columns": {
+          "address": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "city": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "company_name": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "contact_name": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "contact_title": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "country": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "id": {
+            "codecId": "pg/int4@1",
+            "nativeType": "int4"
+          },
+          "phone": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "postal_code": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying"
+          },
+          "region": {
+            "codecId": "pg/varchar@1",
+            "nativeType": "character varying",
+            "nullable": true
+          }
+        },
+        "foreignKeys": [],
+        "indexes": [],
+        "primaryKey": {
+          "columns": [
+            "id"
+          ]
+        },
+        "uniques": []
+      }
+    }
+  },
+  "capabilities": {
+    "postgres": {
+      "jsonAgg": true,
+      "lateral": true,
+      "returning": true
+    }
+  },
+  "extensionPacks": {},
+  "meta": {},
+  "sources": {},
+  "relations": {
+    "customers": {
+      "orders": {
+        "cardinality": "1:N",
+        "on": {
+          "childCols": [
+            "customer_id"
+          ],
+          "parentCols": [
+            "id"
+          ]
+        },
+        "to": "Order"
+      }
+    },
+    "employees": {
+      "orders": {
+        "cardinality": "1:N",
+        "on": {
+          "childCols": [
+            "employee_id"
+          ],
+          "parentCols": [
+            "id"
+          ]
+        },
+        "to": "Order"
+      },
+      "recipient": {
+        "cardinality": "N:1",
+        "on": {
+          "childCols": [
+            "id"
+          ],
+          "parentCols": [
+            "recipient_id"
+          ]
+        },
+        "to": "Employee"
+      },
+      "reporters": {
+        "cardinality": "1:N",
+        "on": {
+          "childCols": [
+            "recipient_id"
+          ],
+          "parentCols": [
+            "id"
+          ]
+        },
+        "to": "Employee"
+      }
+    },
+    "order_details": {
+      "order": {
+        "cardinality": "N:1",
+        "on": {
+          "childCols": [
+            "id"
+          ],
+          "parentCols": [
+            "order_id"
+          ]
+        },
+        "to": "Order"
+      },
+      "product": {
+        "cardinality": "N:1",
+        "on": {
+          "childCols": [
+            "id"
+          ],
+          "parentCols": [
+            "product_id"
+          ]
+        },
+        "to": "Product"
+      }
+    },
+    "orders": {
+      "customer": {
+        "cardinality": "N:1",
+        "on": {
+          "childCols": [
+            "id"
+          ],
+          "parentCols": [
+            "customer_id"
+          ]
+        },
+        "to": "Customer"
+      },
+      "details": {
+        "cardinality": "1:N",
+        "on": {
+          "childCols": [
+            "order_id"
+          ],
+          "parentCols": [
+            "id"
+          ]
+        },
+        "to": "Detail"
+      },
+      "employee": {
+        "cardinality": "N:1",
+        "on": {
+          "childCols": [
+            "id"
+          ],
+          "parentCols": [
+            "employee_id"
+          ]
+        },
+        "to": "Employee"
+      }
+    },
+    "products": {
+      "details": {
+        "cardinality": "1:N",
+        "on": {
+          "childCols": [
+            "product_id"
+          ],
+          "parentCols": [
+            "id"
+          ]
+        },
+        "to": "Detail"
+      },
+      "supplier": {
+        "cardinality": "N:1",
+        "on": {
+          "childCols": [
+            "id"
+          ],
+          "parentCols": [
+            "supplier_id"
+          ]
+        },
+        "to": "Supplier"
+      }
+    },
+    "suppliers": {
+      "products": {
+        "cardinality": "1:N",
+        "on": {
+          "childCols": [
+            "supplier_id"
+          ],
+          "parentCols": [
+            "id"
+          ]
+        },
+        "to": "Product"
+      }
+    }
+  },
+  "_generated": {
+    "warning": "⚠️  GENERATED FILE - DO NOT EDIT",
+    "message": "This file is automatically generated by \"prisma-next contract emit\".",
+    "regenerate": "To regenerate, run: prisma-next contract emit"
+  }
+}

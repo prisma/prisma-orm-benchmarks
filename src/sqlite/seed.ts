@@ -268,10 +268,13 @@ async function main(size: keyof typeof sizes) {
     ]);
 
     for (let orderId = 1; orderId <= config.orders; orderId++) {
-      const count = productCount();
+      const count = Math.min(productCount(), config.products);
+      const productIds = new Set<number>();
+      while (productIds.size < count) {
+        productIds.add(getRandomInt(1, config.products));
+      }
 
-      for (let i = 0; i < count; i++) {
-        const productId = getRandomInt(1, config.products);
+      for (const productId of productIds) {
         const unitPrice = productPrices.get(productId);
 
         detailModels.push({
