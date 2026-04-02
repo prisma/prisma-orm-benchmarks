@@ -50,7 +50,21 @@ const { result } = concurrently(
   ],
   {
     prefix: 'name',
-    killOthers: ['failure', 'success'],
+    killOthers: ['success'],
   },
 );
-result.then(() => console.log('All done!'));
+result.then(
+  () => console.log('All done!'),
+  (closeEvents) => {
+    // When killOthers terminates a process, concurrently rejects with close events.
+    // The bench command finishing (success) kills cpu-usage, which may exit with
+    // a non-zero code due to in-flight fetch requests being aborted. That's expected.
+    const benchEvent = closeEvents.find((e: { command: { name: string } }) => e.command.name === 'bench');
+    if (benchEvent && benchEvent.exitCode === 0) {
+      console.log('All done!');
+      return;
+    }
+    console.error('Benchmark failed:', closeEvents);
+    process.exit(1);
+  },
+);
