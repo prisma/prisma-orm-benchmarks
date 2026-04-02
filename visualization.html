@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Drizzle vs Prisma Benchmark Visualization</title>
+        <title>Drizzle Benchmark Visualization</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
         <style>
@@ -346,7 +346,7 @@
             <header>
                 <h1>🚀 ORM Benchmark Dashboard</h1>
                 <p class="subtitle">
-                    End-to-End Application Performance with Prisma ORM
+                    End-to-End Application Performance with Drizzle ORM
                 </p>
             </header>
 
@@ -459,20 +459,20 @@
         <script>
             // Color scheme for different implementations
             const colors = {
-                "prisma-7.3": {
-                    bg: "rgba(255, 99, 132, 0.2)",
-                    border: "#ff6384",
-                    name: "Prisma 7.3",
-                },
-                "prisma-7.4": {
+                "drizzle": {
                     bg: "rgba(0, 255, 136, 0.2)",
                     border: "#00ff88",
-                    name: "Prisma 7.4 (Query Plan Cache)",
+                    name: "Drizzle (Prepared)",
                 },
-                "prisma-6.19": {
-                    bg: "rgba(255, 206, 86, 0.2)",
-                    border: "#ffce56",
-                    name: "Prisma 6",
+                "drizzle-no-prepared": {
+                    bg: "rgba(255, 99, 132, 0.2)",
+                    border: "#ff6384",
+                    name: "Drizzle (No Prepared)",
+                },
+                "prisma-next": {
+                    bg: "rgba(136, 71, 255, 0.2)",
+                    border: "#8847ff",
+                    name: "Prisma (Next)",
                 },
             };
 

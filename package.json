@@ -12,7 +12,9 @@
     "prepare:prisma": "prisma generate --schema src/schema.prisma",
     "prepare:prisma:sqlite": "prisma generate --schema src/sqlite/schema.prisma",
     "start:prisma": "tsx ./src/prisma-server-node.ts",
-    "start:drizzle": "tsx ./src/drizzle-server-node.ts"
+    "start:drizzle": "tsx ./src/drizzle-server-node.ts",
+    "start:drizzle-no-prepared": "tsx ./src/drizzle-no-prepared-server-node.ts",
+    "start:prisma-next": "tsx ./src/prisma-next-server-node.ts"
   },
   "keywords": [],
   "author": "",
@@ -35,12 +37,17 @@
     "get-port": "^7.0.0",
     "k6": "^0.0.0",
     "postgres": "^3.3.5",
-    "tsx": "^3.12.7",
+    "tsx": "^4.19.2",
     "typescript": "^5.1.6"
   },
   "dependencies": {
     "@duckdb/node-api": "1.4.2-r.1",
     "@hono/node-server": "^1.19.6",
+    "@prisma-next/adapter-postgres": "0.3.0-dev.128",
+    "@prisma-next/postgres": "0.3.0-dev.128",
+    "@prisma-next/sql-contract-ts": "0.3.0-dev.128",
+    "@prisma-next/sql-runtime": "0.3.0-dev.128",
+    "@prisma-next/target-postgres": "0.3.0-dev.128",
     "@prisma/adapter-pg": "7.4.0",
     "@prisma/client": "7.4.0",
     "axios": "^1.4.0",
