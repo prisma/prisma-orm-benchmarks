@@ -10,7 +10,15 @@ async function main() {
   }
   const image = "postgres";
 
-  await docker.pull(image);
+  await new Promise<void>((resolve, reject) => {
+    docker.pull(image, (err: Error | null, stream: NodeJS.ReadableStream) => {
+      if (err) return reject(err);
+      docker.modem.followProgress(stream, (err: Error | null) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+  });
 
   const pgContainer = await docker.createContainer({
     Image: image,
