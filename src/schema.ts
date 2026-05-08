@@ -1,124 +1,118 @@
-import { pgTable, varchar, date, text, foreignKey, integer, doublePrecision, index, serial } from 'drizzle-orm/pg-core';
+import * as d from "drizzle-orm/pg-core";
 
-export const customers = pgTable('customers', {
-  id: serial('id').primaryKey(),
-  companyName: text('company_name').notNull(),
-  contactName: varchar('contact_name').notNull(),
-  contactTitle: varchar('contact_title').notNull(),
-  address: varchar('address').notNull(),
-  city: varchar('city').notNull(),
-  postalCode: varchar('postal_code'),
-  region: varchar('region'),
-  country: varchar('country').notNull(),
-  phone: varchar('phone').notNull(),
-  fax: varchar('fax'),
+export const customers = d.snakeCase.table("customers", {
+  id: d.serial().primaryKey(),
+  companyName: d.text().notNull(),
+  contactName: d.varchar().notNull(),
+  contactTitle: d.varchar().notNull(),
+  address: d.varchar().notNull(),
+  city: d.varchar().notNull(),
+  postalCode: d.varchar(),
+  region: d.varchar(),
+  country: d.varchar().notNull(),
+  phone: d.varchar().notNull(),
+  fax: d.varchar(),
 });
 
-export const employees = pgTable(
-  'employees',
+export const employees = d.snakeCase.table(
+  "employees",
   {
-    id: serial('id').primaryKey(),
-    lastName: varchar('last_name').notNull(),
-    firstName: varchar('first_name'),
-    title: varchar('title').notNull(),
-    titleOfCourtesy: varchar('title_of_courtesy').notNull(),
-    birthDate: date('birth_date', { mode: 'date' }).notNull(),
-    hireDate: date('hire_date', { mode: 'date' }).notNull(),
-    address: varchar('address').notNull(),
-    city: varchar('city').notNull(),
-    postalCode: varchar('postal_code').notNull(),
-    country: varchar('country').notNull(),
-    homePhone: varchar('home_phone').notNull(),
-    extension: integer('extension').notNull(),
-    notes: text('notes').notNull(),
-    recipientId: integer('recipient_id'),
+    id: d.serial().primaryKey(),
+    lastName: d.varchar().notNull(),
+    firstName: d.varchar(),
+    title: d.varchar().notNull(),
+    titleOfCourtesy: d.varchar().notNull(),
+    birthDate: d.date({ mode: "date" }).notNull(),
+    hireDate: d.date({ mode: "date" }).notNull(),
+    address: d.varchar().notNull(),
+    city: d.varchar().notNull(),
+    postalCode: d.varchar().notNull(),
+    country: d.varchar().notNull(),
+    homePhone: d.varchar().notNull(),
+    extension: d.integer().notNull(),
+    notes: d.text().notNull(),
+    recipientId: d.integer(),
   },
-  (table) => ({
-    recipientFk: foreignKey({
+  (table) => [
+    d.foreignKey({
       columns: [table.recipientId],
       foreignColumns: [table.id],
     }),
-    recepientIdx: index('recepient_idx').on(table.recipientId),
-  }),
+    d.index("recepient_idx").on(table.recipientId),
+  ],
 );
 
-export const orders = pgTable('orders', {
-  id: serial('id').primaryKey(),
-  orderDate: date('order_date', { mode: 'date' }).notNull(),
-  requiredDate: date('required_date', { mode: 'date' }).notNull(),
-  shippedDate: date('shipped_date', { mode: 'date' }),
-  shipVia: integer('ship_via').notNull(),
-  freight: doublePrecision('freight').notNull(),
-  shipName: varchar('ship_name').notNull(),
-  shipCity: varchar('ship_city').notNull(),
-  shipRegion: varchar('ship_region'),
-  shipPostalCode: varchar('ship_postal_code'),
-  shipCountry: varchar('ship_country').notNull(),
-
-  customerId: integer('customer_id')
+export const orders = d.snakeCase.table("orders", {
+  id: d.serial().primaryKey(),
+  orderDate: d.date({ mode: "date" }).notNull(),
+  requiredDate: d.date({ mode: "date" }).notNull(),
+  shippedDate: d.date({ mode: "date" }),
+  shipVia: d.integer().notNull(),
+  freight: d.doublePrecision().notNull(),
+  shipName: d.varchar().notNull(),
+  shipCity: d.varchar().notNull(),
+  shipRegion: d.varchar(),
+  shipPostalCode: d.varchar(),
+  shipCountry: d.varchar().notNull(),
+  customerId: d
+    .integer()
     .notNull()
-    .references(() => customers.id, { onDelete: 'cascade' }),
-
-  employeeId: integer('employee_id')
+    .references(() => customers.id, { onDelete: "cascade" }),
+  employeeId: d
+    .integer()
     .notNull()
-    .references(() => employees.id, { onDelete: 'cascade' }),
+    .references(() => employees.id, { onDelete: "cascade" }),
 });
 
-export const suppliers = pgTable('suppliers', {
-  id: serial('id').primaryKey(),
-  companyName: varchar('company_name').notNull(),
-  contactName: varchar('contact_name').notNull(),
-  contactTitle: varchar('contact_title').notNull(),
-  address: varchar('address').notNull(),
-  city: varchar('city').notNull(),
-  region: varchar('region'),
-  postalCode: varchar('postal_code').notNull(),
-  country: varchar('country').notNull(),
-  phone: varchar('phone').notNull(),
+export const suppliers = d.snakeCase.table("suppliers", {
+  id: d.serial().primaryKey(),
+  companyName: d.varchar().notNull(),
+  contactName: d.varchar().notNull(),
+  contactTitle: d.varchar().notNull(),
+  address: d.varchar().notNull(),
+  city: d.varchar().notNull(),
+  region: d.varchar(),
+  postalCode: d.varchar().notNull(),
+  country: d.varchar().notNull(),
+  phone: d.varchar().notNull(),
 });
 
-export const products = pgTable(
-  'products',
+export const products = d.snakeCase.table(
+  "products",
   {
-    id: serial('id').primaryKey(),
-    name: text('name').notNull(),
-    quantityPerUnit: varchar('qt_per_unit').notNull(),
-    unitPrice: doublePrecision('unit_price').notNull(),
-    unitsInStock: integer('units_in_stock').notNull(),
-    unitsOnOrder: integer('units_on_order').notNull(),
-    reorderLevel: integer('reorder_level').notNull(),
-    discontinued: integer('discontinued').notNull(),
-
-    supplierId: serial('supplier_id')
+    id: d.serial().primaryKey(),
+    name: d.text().notNull(),
+    quantityPerUnit: d.varchar().notNull(),
+    unitPrice: d.doublePrecision().notNull(),
+    unitsInStock: d.integer().notNull(),
+    unitsOnOrder: d.integer().notNull(),
+    reorderLevel: d.integer().notNull(),
+    discontinued: d.integer().notNull(),
+    supplierId: d
+      .serial()
       .notNull()
-      .references(() => suppliers.id, { onDelete: 'cascade' }),
+      .references(() => suppliers.id, { onDelete: "cascade" }),
   },
-  (table) => {
-    return {
-      supplierIdx: index('supplier_idx').on(table.supplierId),
-    };
-  },
+  (table) => [d.index("supplier_idx").on(table.supplierId)],
 );
 
-export const details = pgTable(
-  'order_details',
+export const details = d.snakeCase.table(
+  "order_details",
   {
-    unitPrice: doublePrecision('unit_price').notNull(),
-    quantity: integer('quantity').notNull(),
-    discount: doublePrecision('discount').notNull(),
-
-    orderId: integer('order_id')
+    unitPrice: d.doublePrecision().notNull(),
+    quantity: d.integer().notNull(),
+    discount: d.doublePrecision().notNull(),
+    orderId: d
+      .integer()
       .notNull()
-      .references(() => orders.id, { onDelete: 'cascade' }),
-
-    productId: integer('product_id')
+      .references(() => orders.id, { onDelete: "cascade" }),
+    productId: d
+      .integer()
       .notNull()
-      .references(() => products.id, { onDelete: 'cascade' }),
+      .references(() => products.id, { onDelete: "cascade" }),
   },
-  (t) => {
-    return {
-      orderIdIdx: index('order_id_idx').on(t.orderId),
-      productIdIdx: index('product_id_idx').on(t.productId),
-    };
-  },
+  (t) => [
+    d.index("order_id_idx").on(t.orderId),
+    d.index("product_id_idx").on(t.productId),
+  ],
 );

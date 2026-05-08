@@ -10,11 +10,11 @@ import 'dotenv/config';
 import cluster from 'cluster';
 import os from 'os';
 
-const numCPUs = os.cpus().length;
+const numCPUs =  os.cpus().length;
+const client = new Bun.SQL(process.env.DATABASE_URL!, { bigint: true, prepare: true });
 
-const client = new Bun.SQL(process.env.DATABASE_URL!);
-// const client = new pg.Pool({ connectionString: process.env.DATABASE_URL, max: 4, min: 4 });
-const db = drizzle({ client, schema, relations, logger: false });
+// const client = new pg.Pool({ connectionString: process.env.DATABASE_URL, max: 20 });
+const db = drizzle({ client, relations, useJitMappers: true, logger:false });
 
 const p1 = db.query.customers
   .findMany({
@@ -37,7 +37,7 @@ const p2 = db.query.customers
 const p3 = db.query.customers
   .findMany({
     where: {
-      RAW: sql`to_tsvector('english', ${customers.companyName}) @@ to_tsquery('english', ${sql.placeholder('term')})`,
+      RAW:(c) => sql`to_tsvector('english', ${c.companyName}) @@ to_tsquery('english', ${sql.placeholder('term')})`,
     },
   })
   .prepare('p3');
@@ -105,7 +105,7 @@ const p9 = db.query.products
 const p10 = db.query.products
   .findMany({
     where: {
-      RAW: sql`to_tsvector('english', ${products.name}) @@ to_tsquery('english', ${sql.placeholder('term')})`,
+      RAW:(p)=> sql`to_tsvector('english', ${p.name}) @@ to_tsquery('english', ${sql.placeholder('term')})`,
     },
   })
   .prepare('p10');
@@ -257,10 +257,10 @@ if (cluster.isPrimary) {
     console.log(`worker ${worker.process.pid} died`);
   });
 } else {
-  Bun.serve({
-    fetch: app.fetch,
-    port: 3000,
-    reusePort: true,
-  });
-  console.log(`Worker ${process.pid} started`);
+    Bun.serve({
+      fetch: app.fetch,
+      port: 3000,
+      reusePort: true,
+    });
+    console.log(`Worker ${process.pid} started`);
 }

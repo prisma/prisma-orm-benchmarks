@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "bench": "tsx bench/index.ts --host http://localhost:3001 --name prisma-7.4 --folder results",
+    "bench": "tsx bench/index.ts --host http://localhost:3000 --name my-bench --folder results",
     "start:docker": "tsx ./src/docker.ts",
     "start:seed": "tsx ./src/seed.ts",
     "start:seed:sqlite": "tsx ./src/sqlite/seed.ts",
@@ -30,7 +30,7 @@
     "@types/ramda": "^0.29.3",
     "deep-diff": "^1.0.2",
     "dockerode": "^3.3.5",
-    "drizzle-kit": "1.0.0-beta.2-86f844e",
+    "drizzle-kit": "1.0.0-beta.23-0bbcaa2",
     "esbuild": "^0.19.2",
     "get-port": "^7.0.0",
     "k6": "^0.0.0",
@@ -41,18 +41,19 @@
   "dependencies": {
     "@duckdb/node-api": "1.4.2-r.1",
     "@hono/node-server": "^1.19.6",
-    "@prisma/adapter-pg": "7.4.0",
-    "@prisma/client": "7.4.0",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "7.8.0",
     "axios": "^1.4.0",
     "better-sqlite3": "^12.5.0",
     "concurrently": "^8.2.2",
     "dotenv": "^16.3.1",
-    "drizzle-orm": "1.0.0-beta.2-86f844e",
+    "drizzle-orm": "1.0.0-beta.23-0bbcaa2",
     "duckdb": "^1.0.0",
-    "hono": "^4.10.7",
-    "pg": "^8.17.1",
+    "elysia": "^1.4.28",
+    "hono": "^4.12.15",
+    "pg": "^8.20.0",
     "pidusage": "^3.0.2",
-    "prisma": "7.4.0",
+    "prisma": "^7.8.0",
     "ramda": "^0.29.0"
   }
 }
