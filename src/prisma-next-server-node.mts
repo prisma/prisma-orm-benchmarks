@@ -1,6 +1,5 @@
 import { serve } from '@hono/node-server';
 import postgres from '@prisma-next/postgres/runtime';
-import { createCodecRegistry } from '@prisma-next/sql-relational-core/ast';
 import { buildOperation, toExpr } from '@prisma-next/sql-relational-core/expression';
 import type { SqlRuntimeExtensionDescriptor } from '@prisma-next/sql-runtime';
 import cluster from 'cluster';
@@ -22,11 +21,9 @@ const ftsExtension: SqlRuntimeExtensionDescriptor<'postgres'> = {
   version: '0.0.1',
   familyId: 'sql',
   targetId: 'postgres',
-  codecs: () => createCodecRegistry(),
-  parameterizedCodecs: () => [],
-  queryOperations: () => [
-    {
-      method: 'fullTextSearch',
+  codecs: () => [],
+  queryOperations: () => ({
+    fullTextSearch: {
       self: { codecId: 'pg/text@1' },
       impl: (self: unknown, query: unknown) =>
         buildOperation({
@@ -40,8 +37,7 @@ const ftsExtension: SqlRuntimeExtensionDescriptor<'postgres'> = {
           },
         }),
     },
-    {
-      method: 'mul',
+    mul: {
       self: { codecId: 'pg/int4@1' },
       impl: (self: unknown, other: unknown) =>
         buildOperation({
@@ -55,8 +51,7 @@ const ftsExtension: SqlRuntimeExtensionDescriptor<'postgres'> = {
           },
         }),
     },
-    {
-      method: 'castInt',
+    castInt: {
       self: { codecId: 'pg/int8@1' },
       impl: (self: unknown) =>
         buildOperation({
@@ -70,8 +65,7 @@ const ftsExtension: SqlRuntimeExtensionDescriptor<'postgres'> = {
           },
         }),
     },
-    {
-      method: 'castIntFromInt4',
+    castIntFromInt4: {
       self: { codecId: 'pg/int4@1' },
       impl: (self: unknown) =>
         buildOperation({
@@ -85,8 +79,7 @@ const ftsExtension: SqlRuntimeExtensionDescriptor<'postgres'> = {
           },
         }),
     },
-    {
-      method: 'castReal',
+    castReal: {
       self: { codecId: 'pg/float8@1' },
       impl: (self: unknown) =>
         buildOperation({
@@ -100,7 +93,7 @@ const ftsExtension: SqlRuntimeExtensionDescriptor<'postgres'> = {
           },
         }),
     },
-  ],
+  }),
   create() {
     return { familyId: 'sql', targetId: 'postgres' };
   },
@@ -169,24 +162,6 @@ async function main() {
     min: 10,
     max: 10,
   });
-
-  // The runtime queries prisma_contract.marker even when requireMarker is
-  // false (it just doesn't fail on empty rows). The table must exist.
-  await pool.query('CREATE SCHEMA IF NOT EXISTS prisma_contract');
-  await pool.query(`CREATE TABLE IF NOT EXISTS prisma_contract.marker (
-    id smallint primary key default 1,
-    core_hash text not null,
-    profile_hash text not null,
-    contract_json jsonb,
-    canonical_version int,
-    updated_at timestamptz not null default now(),
-    app_tag text,
-    meta jsonb not null default '{}',
-    invariants jsonb
-  )`);
-  // Earlier runs may have created the table without `invariants` (PR 444's
-  // marker reader queries it); backfill idempotently.
-  await pool.query('ALTER TABLE prisma_contract.marker ADD COLUMN IF NOT EXISTS invariants jsonb');
 
   const db = postgres({
     contract,

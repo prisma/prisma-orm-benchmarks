@@ -13,7 +13,7 @@ import os from 'os';
 const numCPUs = os.cpus().length;
 
 const client = new Database('src/sqlite/northwind.db');
-const db = drizzle(client, { schema, logger: false });
+const db = drizzle({ client, schema, logger: false });
 
 const p1 = db.query.customers
   .findMany({
