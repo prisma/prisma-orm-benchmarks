@@ -44,7 +44,10 @@ const Employee = model('Employee', {
   },
 }).sql(({ cols, constraints }) => ({
   table: 'employees',
-  foreignKeys: [constraints.foreignKey(cols.recipientId, Employee.refs.id)],
+  // Self-referential FK: forward-reference the model by name via `constraints.ref`
+  // to avoid the `const Employee = ... Employee.refs.id ...` circular type that
+  // TS cannot resolve in the initializer.
+  foreignKeys: [constraints.foreignKey(cols.recipientId, constraints.ref('Employee', 'id'))],
 }));
 
 const Order = model('Order', {
@@ -126,11 +129,6 @@ const Detail = model('Detail', {
 export const contract = defineContract({
   family: sqlFamily,
   target: postgresPack,
-  capabilities: {
-    postgres: {
-      returning: true,
-    },
-  },
   models: {
     Customer,
     Employee,

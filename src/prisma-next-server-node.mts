@@ -1,103 +1,32 @@
 import { serve } from '@hono/node-server';
 import postgres from '@prisma-next/postgres/runtime';
-import { buildOperation, toExpr } from '@prisma-next/sql-relational-core/expression';
-import type { SqlRuntimeExtensionDescriptor } from '@prisma-next/sql-runtime';
 import cluster from 'cluster';
 import 'dotenv/config';
 import { Hono } from 'hono';
 import os from 'os';
 import pg from 'pg';
-import cpuUsageRaw from './cpu-usage';
+import cpuUsageRaw from './cpu-usage.js';
 import { contract } from './prisma-next-contract.mjs';
 
-// CJS-into-ESM interop: tsx wraps a CJS default export as `{ default: x }`.
-const cpuUsage = (cpuUsageRaw as { default?: typeof cpuUsageRaw }).default ?? cpuUsageRaw;
+// `./cpu-usage.ts` is a CJS module; under tsx + nodenext, an ESM importer
+// receives the module namespace `{ default, 'module.exports' }`, where
+// `default` is itself another wrapper `{ default: app }`. Walk both layers
+// defensively (a single-level wrap is what plain Node would deliver) so the
+// code keeps working regardless of how the runtime materialises the interop.
+const cpuUsage: Hono = (() => {
+  let v: unknown = cpuUsageRaw;
+  while (
+    v &&
+    typeof v === 'object' &&
+    'default' in (v as Record<string, unknown>) &&
+    !('routes' in (v as Record<string, unknown>))
+  ) {
+    v = (v as { default: unknown }).default;
+  }
+  return v as Hono;
+})();
 
 const numCPUs = os.cpus().length;
-
-const ftsExtension: SqlRuntimeExtensionDescriptor<'postgres'> = {
-  kind: 'extension',
-  id: 'bench-fts',
-  version: '0.0.1',
-  familyId: 'sql',
-  targetId: 'postgres',
-  codecs: () => [],
-  queryOperations: () => ({
-    fullTextSearch: {
-      self: { codecId: 'pg/text@1' },
-      impl: (self: unknown, query: unknown) =>
-        buildOperation({
-          method: 'fullTextSearch',
-          args: [toExpr(self, 'pg/text@1'), toExpr(query, 'pg/text@1')],
-          returns: { codecId: 'pg/bool@1', nullable: false },
-          lowering: {
-            targetFamily: 'sql',
-            strategy: 'function',
-            template: "to_tsvector('english', {{self}}) @@ to_tsquery('english', {{arg0}})",
-          },
-        }),
-    },
-    mul: {
-      self: { codecId: 'pg/int4@1' },
-      impl: (self: unknown, other: unknown) =>
-        buildOperation({
-          method: 'mul',
-          args: [toExpr(self, 'pg/int4@1'), toExpr(other, 'pg/float8@1')],
-          returns: { codecId: 'pg/float8@1', nullable: false },
-          lowering: {
-            targetFamily: 'sql',
-            strategy: 'function',
-            template: '{{self}} * {{arg0}}',
-          },
-        }),
-    },
-    castInt: {
-      self: { codecId: 'pg/int8@1' },
-      impl: (self: unknown) =>
-        buildOperation({
-          method: 'castInt',
-          args: [toExpr(self, 'pg/int8@1')],
-          returns: { codecId: 'pg/int4@1', nullable: false },
-          lowering: {
-            targetFamily: 'sql',
-            strategy: 'function',
-            template: '({{self}})::int',
-          },
-        }),
-    },
-    castIntFromInt4: {
-      self: { codecId: 'pg/int4@1' },
-      impl: (self: unknown) =>
-        buildOperation({
-          method: 'castIntFromInt4',
-          args: [toExpr(self, 'pg/int4@1')],
-          returns: { codecId: 'pg/int4@1', nullable: false },
-          lowering: {
-            targetFamily: 'sql',
-            strategy: 'function',
-            template: '({{self}})::int',
-          },
-        }),
-    },
-    castReal: {
-      self: { codecId: 'pg/float8@1' },
-      impl: (self: unknown) =>
-        buildOperation({
-          method: 'castReal',
-          args: [toExpr(self, 'pg/float8@1')],
-          returns: { codecId: 'pg/float4@1', nullable: false },
-          lowering: {
-            targetFamily: 'sql',
-            strategy: 'function',
-            template: '({{self}})::real',
-          },
-        }),
-    },
-  }),
-  create() {
-    return { familyId: 'sql', targetId: 'postgres' };
-  },
-};
 
 const customerColumns = [
   'id',
@@ -166,8 +95,7 @@ async function main() {
   const db = postgres({
     contract,
     binding: { kind: 'pgPool', pool },
-    extensions: [ftsExtension],
-    verify: { mode: 'onFirstUse', requireMarker: false },
+    verifyMarker: 'onFirstUse',
   });
   const runtime = db.runtime();
 
@@ -193,7 +121,12 @@ async function main() {
   const psSearchCustomer = await db.prepare({ term: 'pg/text@1' }, (sql, params) =>
     sql.customers
       .select(...customerColumns)
-      .where((f, fns) => fns['fullTextSearch'](f.company_name, params.term))
+      .where(
+        (f, fns) =>
+          fns.raw`to_tsvector('english', ${f.company_name}) @@ to_tsquery('english', ${params.term})`.returns(
+            'pg/bool@1',
+          ),
+      )
       .build(),
   );
 
@@ -309,7 +242,12 @@ async function main() {
   const psSearchProduct = await db.prepare({ term: 'pg/text@1' }, (sql, params) =>
     sql.products
       .select(...productColumns)
-      .where((f, fns) => fns['fullTextSearch'](f.name, params.term))
+      .where(
+        (f, fns) =>
+          fns.raw`to_tsvector('english', ${f.name}) @@ to_tsquery('english', ${params.term})`.returns(
+            'pg/bool@1',
+          ),
+      )
       .build(),
   );
 
@@ -326,11 +264,14 @@ async function main() {
           ship_name: f.orders.ship_name,
           ship_city: f.orders.ship_city,
           ship_country: f.orders.ship_country,
-          productsCount: fns['castInt'](fns.count(f.order_details.product_id)),
-          quantitySum: fns['castIntFromInt4'](fns.sum(f.order_details.quantity)),
-          totalPrice: fns['castReal'](
-            fns.sum(fns['mul'](f.order_details.quantity, f.order_details.unit_price)),
+          productsCount: fns.raw`(${fns.count(f.order_details.product_id)})::int`.returns(
+            'pg/int4@1',
           ),
+          quantitySum: fns.raw`(${fns.sum(f.order_details.quantity)})::int`.returns('pg/int4@1'),
+          totalPrice:
+            fns.raw`(${fns.sum(fns.raw`${f.order_details.quantity} * ${f.order_details.unit_price}`.returns('pg/float8@1'))})::real`.returns(
+              'pg/float4@1',
+            ),
         }))
         .groupBy((f) => f.orders.id)
         .orderBy((f) => f.orders.id)
@@ -348,11 +289,14 @@ async function main() {
         ship_name: f.orders.ship_name,
         ship_city: f.orders.ship_city,
         ship_country: f.orders.ship_country,
-        productsCount: fns['castInt'](fns.count(f.order_details.product_id)),
-        quantitySum: fns['castIntFromInt4'](fns.sum(f.order_details.quantity)),
-        totalPrice: fns['castReal'](
-          fns.sum(fns['mul'](f.order_details.quantity, f.order_details.unit_price)),
+        productsCount: fns.raw`(${fns.count(f.order_details.product_id)})::int`.returns(
+          'pg/int4@1',
         ),
+        quantitySum: fns.raw`(${fns.sum(f.order_details.quantity)})::int`.returns('pg/int4@1'),
+        totalPrice:
+          fns.raw`(${fns.sum(fns.raw`${f.order_details.quantity} * ${f.order_details.unit_price}`.returns('pg/float8@1'))})::real`.returns(
+            'pg/float4@1',
+          ),
       }))
       .where((f, fns) => fns.eq(f.orders.id, params.id))
       .groupBy((f) => f.orders.id)
