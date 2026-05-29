@@ -11,7 +11,7 @@ export default defineConfig({
   target: postgres,
   driver: postgresDriver,
   adapter: postgresAdapter,
-  contract: prismaContract('./src/prisma-next-schema.prisma', {
+  contract: prismaContract('./src/prisma-next-contract.prisma', {
     output: 'src/generated/prisma-next-contract.json',
     target: postgres,
   }),
