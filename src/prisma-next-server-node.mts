@@ -5,26 +5,8 @@ import 'dotenv/config';
 import { Hono } from 'hono';
 import os from 'os';
 import pg from 'pg';
-import cpuUsageRaw from './cpu-usage.js';
+import cpuUsage from './cpu-usage.js';
 import { contract } from './prisma-next-contract.mjs';
-
-// `./cpu-usage.ts` is a CJS module; under tsx + nodenext, an ESM importer
-// receives the module namespace `{ default, 'module.exports' }`, where
-// `default` is itself another wrapper `{ default: app }`. Walk both layers
-// defensively (a single-level wrap is what plain Node would deliver) so the
-// code keeps working regardless of how the runtime materialises the interop.
-const cpuUsage: Hono = (() => {
-  let v: unknown = cpuUsageRaw;
-  while (
-    v &&
-    typeof v === 'object' &&
-    'default' in (v as Record<string, unknown>) &&
-    !('routes' in (v as Record<string, unknown>))
-  ) {
-    v = (v as { default: unknown }).default;
-  }
-  return v as Hono;
-})();
 
 const numCPUs = os.cpus().length;
 
