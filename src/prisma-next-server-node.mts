@@ -6,7 +6,8 @@ import { Hono } from 'hono';
 import os from 'os';
 import pg from 'pg';
 import cpuUsage from './cpu-usage.js';
-import { contract } from './prisma-next-contract.mjs';
+import type { Contract } from './generated/prisma-next-contract.js';
+import contractJson from './generated/prisma-next-contract.json' with { type: 'json' };
 
 const numCPUs = os.cpus().length;
 
@@ -74,8 +75,8 @@ async function main() {
     max: 10,
   });
 
-  const db = postgres({
-    contract,
+  const db = postgres<Contract>({
+    contractJson,
     binding: { kind: 'pgPool', pool },
     verifyMarker: 'onFirstUse',
   });

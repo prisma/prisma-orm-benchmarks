@@ -17,13 +17,19 @@ importers:
       '@prisma-next/adapter-postgres':
         specifier: 0.11.0-dev.43
         version: 0.11.0-dev.43(typanion@3.14.0)
+      '@prisma-next/cli':
+        specifier: 0.11.0-dev.43
+        version: 0.11.0-dev.43(typanion@3.14.0)
+      '@prisma-next/driver-postgres':
+        specifier: 0.11.0-dev.43
+        version: 0.11.0-dev.43
       '@prisma-next/family-sql':
         specifier: 0.11.0-dev.43
         version: 0.11.0-dev.43
       '@prisma-next/postgres':
         specifier: 0.11.0-dev.43
         version: 0.11.0-dev.43(typanion@3.14.0)
-      '@prisma-next/sql-contract-ts':
+      '@prisma-next/sql-contract-psl':
         specifier: 0.11.0-dev.43
         version: 0.11.0-dev.43
       '@prisma-next/sql-relational-core':
