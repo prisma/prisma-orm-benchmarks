@@ -346,8 +346,8 @@
             <header>
                 <h1>🚀 ORM Benchmark Dashboard</h1>
                 <p class="subtitle">
-                    End-to-End Application Performance: Drizzle vs Prisma vs
-                    Prisma Next
+                    End-to-End Application Performance: pg (raw SQL) vs Prisma
+                    vs Prisma Next
                 </p>
             </header>
 
@@ -458,12 +458,19 @@
         </div>
 
         <script>
-            // Color scheme for different implementations
+            // Color scheme for different implementations.
+            // NOTE: drizzle is temporarily disabled from the visualization.
+            // Re-enable by uncommenting the entry below.
             const colors = {
-                drizzle: {
-                    bg: "rgba(255, 206, 86, 0.2)",
-                    border: "#ffce56",
-                    name: "Drizzle",
+                // drizzle: {
+                //     bg: "rgba(255, 206, 86, 0.2)",
+                //     border: "#ffce56",
+                //     name: "Drizzle",
+                // },
+                pg: {
+                    bg: "rgba(72, 207, 173, 0.2)",
+                    border: "#48cfad",
+                    name: "pg (raw SQL)",
                 },
                 prisma7: {
                     bg: "rgba(255, 99, 132, 0.2)",

@@ -14,7 +14,8 @@
     "prepare:prisma-next": "prisma-next contract emit",
     "start:prisma": "tsx ./src/prisma-server-node.ts",
     "start:drizzle": "tsx ./src/drizzle-server-node.ts",
-    "start:prisma-next": "tsx ./src/prisma-next-server-node.mts"
+    "start:prisma-next": "tsx ./src/prisma-next-server-node.mts",
+    "start:pg": "tsx ./src/pg-server-node.ts"
   },
   "keywords": [],
   "author": "",

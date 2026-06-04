@@ -30,7 +30,7 @@ DATABASE_URL="postgres://postgres:postgres@localhost:5432/postgres"
 main("micro"); // nano | micro
 ```
 4. Make sure you have Node version 18 installed or above, we've used Node v24. You can use [`nvm use 24`](https://github.com/nvm-sh/nvm) command
-5. Start Drizzle/Prisma server:
+5. Start Drizzle/Prisma/pg server:
 ```bash
 ## Drizzle
 pnpm start:drizzle
@@ -38,6 +38,9 @@ pnpm start:drizzle
 ## Prisma
 pnpm prepare:prisma
 pnpm start:prisma
+
+## Raw pg + raw SQL (port 3003)
+pnpm start:pg
 ```
 
 ## Prepare testing machine
@@ -50,7 +53,12 @@ tsx bench/index --host http://192.168.31.144:3000 --name my-bench --folder resul
 
 http://192.168.31.144:3000 // drizzle
 http://192.168.31.144:3001 // prisma
+http://192.168.31.144:3002 // prisma-next
+http://192.168.31.144:3003 // pg (raw SQL)
 ```
+
+To make a run show up in `visualization.html`, name the run with the key the
+visualization expects (e.g. `--name pg`, `--name prisma7`, `--name prisma-next`).
 4. Prepare final combined results  
 After benchmarks finish, merge all outputs into a single JSON file:
 ```bash
