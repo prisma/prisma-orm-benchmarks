@@ -109,7 +109,7 @@ async function main(size: keyof typeof sizes) {
 
   try {
     const client = new Database('src/sqlite/northwind.db');
-    const db = drizzle(client, { logger: false });
+    const db = drizzle({ client, logger: false });
 
     migrate(db, { migrationsFolder: 'src/sqlite/drizzle' });
 

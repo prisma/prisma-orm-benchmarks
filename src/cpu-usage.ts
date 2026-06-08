@@ -32,4 +32,11 @@ app.get('/stats', (c) => {
   return c.json(result);
 });
 
-export default app;
+// Use `export =` (CJS module.exports = app) instead of `export default app`.
+// With `export default`, the compiled CJS module is `{ default: app, __esModule: true }`,
+// which causes ESM importers (under nodenext) and tsx's interop to expose the
+// value behind one — or, under tsx, two — layers of `.default`. `export =`
+// instead compiles to `module.exports = app`, so every importer (CJS sibling
+// `.ts` files via esModuleInterop, ESM `.mts` files via Node's CJS-import
+// synthesis) sees `cpuUsage` as the Hono instance directly.
+export = app;

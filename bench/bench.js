@@ -57,13 +57,9 @@ export default function () {
   // const url = `${host}${params}`;
 
   http.get(url, {
-    headers: {
-      Connection: 'keep-alive',
-      'Keep-Alive': 'timeout=5, max=1000',
-    },
     tags: { name: 'fetch' },
     timeout: '30s',
   });
 
-  sleep(0.1 * (scenario.iterationInTest % 6));
+  sleep(0.075 * (scenario.iterationInTest % 6));
 }

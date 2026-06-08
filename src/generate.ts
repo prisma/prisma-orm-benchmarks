@@ -53,7 +53,7 @@ function shuffle(arr: any[]) {
 
 const main = async () => {
   const client = postgres(process.env.DATABASE_URL);
-  const db = drizzle(client, { logger: false });
+  const db = drizzle({ client, logger: false });
 
   const [
     { minId: employeesMinId, maxId: employeesMaxId, count: employeesCount },

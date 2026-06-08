@@ -1,0 +1,125 @@
+// Prisma Next contract for the Northwind-style benchmark schema.
+//
+// Field names mirror the snake_case column names of the existing tables so the
+// sql-builder field proxy (`f.company_name`, `f.recipient_id`, ...) keeps the
+// same shape as the hand-written TS contract this replaces. Relation fields are
+// declared because PSL requires both sides of every `@relation`, but we don't
+// rely on them in the prepared queries (which use explicit JOINs).
+
+model Customer {
+  id            Int     @id @default(autoincrement())
+  company_name  String
+  contact_name  String
+  contact_title String
+  address       String
+  city          String
+  postal_code   String?
+  region        String?
+  country       String
+  phone         String
+  fax           String?
+
+  orders Order[]
+
+  @@map("customers")
+}
+
+model Employee {
+  id                Int       @id @default(autoincrement())
+  last_name         String
+  first_name        String?
+  title             String
+  title_of_courtesy String
+  birth_date        DateTime
+  hire_date         DateTime
+  address           String
+  city              String
+  postal_code       String
+  country           String
+  home_phone        String
+  extension         Int
+  notes             String
+  recipient_id      Int?
+
+  // Self-FK on recipient_id → id. The relation name disambiguates the two
+  // PSL relation fields (`recipient` / `subordinates`) referring to the same
+  // pair of models, as PSL requires for self-relations.
+  recipient    Employee?  @relation("EmployeeRecipient", fields: [recipient_id], references: [id])
+  subordinates Employee[] @relation("EmployeeRecipient")
+
+  orders Order[]
+
+  @@map("employees")
+}
+
+model Order {
+  id               Int       @id @default(autoincrement())
+  order_date       DateTime
+  required_date    DateTime
+  shipped_date     DateTime?
+  ship_via         Int
+  freight          Float
+  ship_name        String
+  ship_city        String
+  ship_region      String?
+  ship_postal_code String?
+  ship_country     String
+  customer_id      Int
+  employee_id      Int
+
+  customer Customer @relation(fields: [customer_id], references: [id])
+  employee Employee @relation(fields: [employee_id], references: [id])
+
+  details Detail[]
+
+  @@map("orders")
+}
+
+model Supplier {
+  id            Int     @id @default(autoincrement())
+  company_name  String
+  contact_name  String
+  contact_title String
+  address       String
+  city          String
+  region        String?
+  postal_code   String
+  country       String
+  phone         String
+
+  products Product[]
+
+  @@map("suppliers")
+}
+
+model Product {
+  id             Int    @id @default(autoincrement())
+  name           String
+  qt_per_unit    String
+  unit_price     Float
+  units_in_stock Int
+  units_on_order Int
+  reorder_level  Int
+  discontinued   Int
+  supplier_id    Int
+
+  supplier Supplier @relation(fields: [supplier_id], references: [id])
+
+  details Detail[]
+
+  @@map("products")
+}
+
+model Detail {
+  unit_price Float
+  quantity   Int
+  discount   Float
+  order_id   Int
+  product_id Int
+
+  order   Order   @relation(fields: [order_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@id([order_id, product_id])
+  @@map("order_details")
+}
