@@ -4,5 +4,7 @@ allowBuilds:
   cpu-features: true
   duckdb: true
   esbuild: true
+  msgpackr-extract: true
   prisma: true
   ssh2: false
+  workerd: true

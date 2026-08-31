@@ -3,7 +3,7 @@
 A benchmark suite comparing the end-to-end HTTP performance of several
 PostgreSQL access strategies from Node.js:
 
-- **Prisma Next** (`@prisma-next/*`)
+- **Prisma 8 RC** (`@prisma/orm-postgres`)
 - **Prisma 7** (`@prisma/client`)
 - **Drizzle** (`drizzle-orm`)
 - **Raw `pg` + raw SQL** (baseline)
@@ -22,7 +22,7 @@ combined into `data.json` and rendered by `visualization.html`.
 - [k6](https://k6.io/docs/get-started/installation/) — load generator
 - [DuckDB](https://duckdb.org/docs/installation/) — used by the
   result-preparation pipeline
-- Node.js ≥ 18 (the project is developed against Node 24) and
+- Node.js ≥ 22.18 (required by Prisma 8; the project is developed against Node 24) and
   [pnpm](https://pnpm.io/)
 
 ## Setup
@@ -72,7 +72,7 @@ to benchmark, repeat the following loop:
    run `pnpm tsx bench/index` against it.
 3. Stop the server.
 
-### Prisma Next — port 3002
+### Prisma 8 RC — port 3002
 
 ```bash
 # Server (one-time contract codegen, then start)

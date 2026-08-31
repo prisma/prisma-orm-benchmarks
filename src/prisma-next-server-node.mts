@@ -1,13 +1,15 @@
+import 'temporal-polyfill/full/global';
+
 import { serve } from '@hono/node-server';
-import postgres from '@prisma-next/postgres/runtime';
+import postgres from '@prisma/orm-postgres/runtime';
 import cluster from 'cluster';
 import 'dotenv/config';
 import { Hono } from 'hono';
 import os from 'os';
 import pg from 'pg';
 import cpuUsage from './cpu-usage.js';
-import type { Contract } from './generated/prisma-next-contract.js';
-import contractJson from './generated/prisma-next-contract.json' with { type: 'json' };
+import type { Contract } from './generated/prisma8/contract.js';
+import contractJson from './generated/prisma8/contract.json' with { type: 'json' };
 
 const numCPUs = os.cpus().length;
 
@@ -85,7 +87,7 @@ async function main() {
   const psCustomers = await db.prepare(
     { limit: 'pg/int4@1', offset: 'pg/int4@1' },
     (sql, params) =>
-      sql.customers
+      sql.public.customers
         .select(...customerColumns)
         .orderBy('id')
         .limit(params.limit)
@@ -94,7 +96,7 @@ async function main() {
   );
 
   const psCustomerById = await db.prepare({ id: 'pg/int4@1' }, (sql, params) =>
-    sql.customers
+    sql.public.customers
       .select(...customerColumns)
       .where((f, fns) => fns.eq(f.id, params.id))
       .limit(1)
@@ -102,7 +104,7 @@ async function main() {
   );
 
   const psSearchCustomer = await db.prepare({ term: 'pg/text@1' }, (sql, params) =>
-    sql.customers
+    sql.public.customers
       .select(...customerColumns)
       .where(
         (f, fns) =>
@@ -116,7 +118,7 @@ async function main() {
   const psEmployees = await db.prepare(
     { limit: 'pg/int4@1', offset: 'pg/int4@1' },
     (sql, params) =>
-      sql.employees
+      sql.public.employees
         .select(...employeeColumns)
         .orderBy('id')
         .limit(params.limit)
@@ -125,9 +127,11 @@ async function main() {
   );
 
   const psEmployeeWithRecipient = await db.prepare({ id: 'pg/int4@1' }, (sql, params) =>
-    sql.employees
+    sql.public.employees
       .as('e')
-      .outerLeftJoin(sql.employees.as('r'), (f, fns) => fns.eq(f.e.recipient_id, f.r.id))
+      .outerLeftJoin(sql.public.employees.as('r'), (f, fns) =>
+        fns.eq(f.e.recipient_id, f.r.id),
+      )
       .select((f) => ({
         id: f.e.id,
         last_name: f.e.last_name,
@@ -167,7 +171,7 @@ async function main() {
   const psSuppliers = await db.prepare(
     { limit: 'pg/int4@1', offset: 'pg/int4@1' },
     (sql, params) =>
-      sql.suppliers
+      sql.public.suppliers
         .select(...supplierColumns)
         .orderBy('id')
         .limit(params.limit)
@@ -176,7 +180,7 @@ async function main() {
   );
 
   const psSupplierById = await db.prepare({ id: 'pg/int4@1' }, (sql, params) =>
-    sql.suppliers
+    sql.public.suppliers
       .select(...supplierColumns)
       .where((f, fns) => fns.eq(f.id, params.id))
       .limit(1)
@@ -186,7 +190,7 @@ async function main() {
   const psProducts = await db.prepare(
     { limit: 'pg/int4@1', offset: 'pg/int4@1' },
     (sql, params) =>
-      sql.products
+      sql.public.products
         .select(...productColumns)
         .orderBy('id')
         .limit(params.limit)
@@ -195,8 +199,10 @@ async function main() {
   );
 
   const psProductWithSupplier = await db.prepare({ id: 'pg/int4@1' }, (sql, params) =>
-    sql.products
-      .outerLeftJoin(sql.suppliers, (f, fns) => fns.eq(f.products.supplier_id, f.suppliers.id))
+    sql.public.products
+      .outerLeftJoin(sql.public.suppliers, (f, fns) =>
+        fns.eq(f.products.supplier_id, f.suppliers.id),
+      )
       .select((f) => ({
         id: f.products.id,
         name: f.products.name,
@@ -223,7 +229,7 @@ async function main() {
   );
 
   const psSearchProduct = await db.prepare({ term: 'pg/text@1' }, (sql, params) =>
-    sql.products
+    sql.public.products
       .select(...productColumns)
       .where(
         (f, fns) =>
@@ -237,8 +243,8 @@ async function main() {
   const psOrdersWithDetails = await db.prepare(
     { limit: 'pg/int4@1', offset: 'pg/int4@1' },
     (sql, params) =>
-      sql.orders
-        .outerLeftJoin(sql.order_details, (f, fns) =>
+      sql.public.orders
+        .outerLeftJoin(sql.public.order_details, (f, fns) =>
           fns.eq(f.orders.id, f.order_details.order_id),
         )
         .select((f, fns) => ({
@@ -264,8 +270,10 @@ async function main() {
   );
 
   const psOrderWithDetails = await db.prepare({ id: 'pg/int4@1' }, (sql, params) =>
-    sql.orders
-      .outerLeftJoin(sql.order_details, (f, fns) => fns.eq(f.orders.id, f.order_details.order_id))
+    sql.public.orders
+      .outerLeftJoin(sql.public.order_details, (f, fns) =>
+        fns.eq(f.orders.id, f.order_details.order_id),
+      )
       .select((f, fns) => ({
         id: f.orders.id,
         shipped_date: f.orders.shipped_date,
@@ -288,9 +296,11 @@ async function main() {
   );
 
   const psOrderWithDetailsAndProducts = await db.prepare({ id: 'pg/int4@1' }, (sql, params) =>
-    sql.orders
-      .outerLeftJoin(sql.order_details, (f, fns) => fns.eq(f.orders.id, f.order_details.order_id))
-      .outerLeftJoin(sql.products, (f, fns) =>
+    sql.public.orders
+      .outerLeftJoin(sql.public.order_details, (f, fns) =>
+        fns.eq(f.orders.id, f.order_details.order_id),
+      )
+      .outerLeftJoin(sql.public.products, (f, fns) =>
         fns.eq(f.order_details.product_id, f.products.id),
       )
       .select((f) => ({
@@ -332,83 +342,83 @@ async function main() {
   app.get('/customers', async (c) => {
     const limit = Number(c.req.query('limit'));
     const offset = Number(c.req.query('offset'));
-    const result = await psCustomers.execute(runtime, { limit, offset });
+    const result = await psCustomers.query(runtime, { limit, offset });
     return c.json(result);
   });
 
   app.get('/customer-by-id', async (c) => {
     const id = Number(c.req.query('id'));
-    const rows = await psCustomerById.execute(runtime, { id });
+    const rows = await psCustomerById.query(runtime, { id });
     return c.json(rows[0] ?? null);
   });
 
   app.get('/search-customer', async (c) => {
     const term = `${c.req.query('term')}:*`;
-    const result = await psSearchCustomer.execute(runtime, { term });
+    const result = await psSearchCustomer.query(runtime, { term });
     return c.json(result);
   });
 
   app.get('/employees', async (c) => {
     const limit = Number(c.req.query('limit'));
     const offset = Number(c.req.query('offset'));
-    const result = await psEmployees.execute(runtime, { limit, offset });
+    const result = await psEmployees.query(runtime, { limit, offset });
     return c.json(result);
   });
 
   app.get('/employee-with-recipient', async (c) => {
     const id = Number(c.req.query('id'));
-    const result = await psEmployeeWithRecipient.execute(runtime, { id });
+    const result = await psEmployeeWithRecipient.query(runtime, { id });
     return c.json(result);
   });
 
   app.get('/suppliers', async (c) => {
     const limit = Number(c.req.query('limit'));
     const offset = Number(c.req.query('offset'));
-    const result = await psSuppliers.execute(runtime, { limit, offset });
+    const result = await psSuppliers.query(runtime, { limit, offset });
     return c.json(result);
   });
 
   app.get('/supplier-by-id', async (c) => {
     const id = Number(c.req.query('id'));
-    const rows = await psSupplierById.execute(runtime, { id });
+    const rows = await psSupplierById.query(runtime, { id });
     return c.json(rows[0] ?? null);
   });
 
   app.get('/products', async (c) => {
     const limit = Number(c.req.query('limit'));
     const offset = Number(c.req.query('offset'));
-    const result = await psProducts.execute(runtime, { limit, offset });
+    const result = await psProducts.query(runtime, { limit, offset });
     return c.json(result);
   });
 
   app.get('/product-with-supplier', async (c) => {
     const id = Number(c.req.query('id'));
-    const result = await psProductWithSupplier.execute(runtime, { id });
+    const result = await psProductWithSupplier.query(runtime, { id });
     return c.json(result);
   });
 
   app.get('/search-product', async (c) => {
     const term = `${c.req.query('term')}:*`;
-    const result = await psSearchProduct.execute(runtime, { term });
+    const result = await psSearchProduct.query(runtime, { term });
     return c.json(result);
   });
 
   app.get('/orders-with-details', async (c) => {
     const limit = Number(c.req.query('limit'));
     const offset = Number(c.req.query('offset'));
-    const result = await psOrdersWithDetails.execute(runtime, { limit, offset });
+    const result = await psOrdersWithDetails.query(runtime, { limit, offset });
     return c.json(result);
   });
 
   app.get('/order-with-details', async (c) => {
     const id = Number(c.req.query('id'));
-    const result = await psOrderWithDetails.execute(runtime, { id });
+    const result = await psOrderWithDetails.query(runtime, { id });
     return c.json(result);
   });
 
   app.get('/order-with-details-and-products', async (c) => {
     const id = Number(c.req.query('id'));
-    const result = await psOrderWithDetailsAndProducts.execute(runtime, { id });
+    const result = await psOrderWithDetailsAndProducts.query(runtime, { id });
     return c.json(result);
   });
 

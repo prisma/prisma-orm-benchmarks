@@ -1,4 +1,4 @@
-// Prisma Next contract for the Northwind-style benchmark schema.
+// Prisma 8 contract for the Northwind-style benchmark schema.
 //
 // Field names mirror the snake_case column names of the existing tables so the
 // sql-builder field proxy (`f.company_name`, `f.recipient_id`, ...) keeps the
@@ -30,8 +30,8 @@ model Employee {
   first_name        String?
   title             String
   title_of_courtesy String
-  birth_date        DateTime
-  hire_date         DateTime
+  birth_date        Date
+  hire_date         Date
   address           String
   city              String
   postal_code       String
@@ -54,9 +54,9 @@ model Employee {
 
 model Order {
   id               Int       @id @default(autoincrement())
-  order_date       DateTime
-  required_date    DateTime
-  shipped_date     DateTime?
+  order_date       Date
+  required_date    Date
+  shipped_date     Date?
   ship_via         Int
   freight          Float
   ship_name        String
