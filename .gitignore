@@ -4,3 +4,6 @@ results
 dist
 data.json
 tmp
+src/generated/prisma
+.claude/settings.local.json
+.claude/skills
